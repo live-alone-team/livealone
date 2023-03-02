@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    url: jdbc:mysql://livealone-1.cpnhhe5fivsu.ap-northeast-2.rds.amazonaws.com:3306/livealone
+    password: livealone!
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: 'true'
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  profiles:
+    include: oauth
+
+  web:
+    resources:
+      static-locations: file:src/main/resources/static/profile/
