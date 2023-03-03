@@ -2,6 +2,7 @@ package live.alone.soleplay.service;
 
 import live.alone.soleplay.dto.CommentRequest;
 import live.alone.soleplay.dto.CommentResponse;
+import live.alone.soleplay.dto.CommentUpdate;
 import live.alone.soleplay.entity.Comment;
 import live.alone.soleplay.entity.Member;
 import live.alone.soleplay.exception.CustomException;
@@ -50,5 +51,18 @@ public class CommentService {
                 .stream()
                 .map(CommentResponse::new)
                 .collect(Collectors.toList());
+    }
+
+    public CommentUpdate updateComment(CommentUpdate commentUpdate, Long commentId, Long memberId) {
+        memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
+
+        comment.setContent(commentUpdate.getContent());
+        commentRepository.save(comment);
+
+        return commentUpdate;
     }
 }
