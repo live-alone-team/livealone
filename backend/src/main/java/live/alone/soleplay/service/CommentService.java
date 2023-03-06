@@ -10,11 +10,11 @@ import live.alone.soleplay.exception.ErrorCode;
 import live.alone.soleplay.repository.CommentRepository;
 import live.alone.soleplay.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -38,31 +38,34 @@ public class CommentService {
         return commentRequest;
     }
 
-    public void deleteComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
-
-        commentRepository.delete(comment);
-    }
-
     @Transactional(readOnly = true)
-    public List<CommentResponse> findAllComments() {
-        return commentRepository.findAll(Sort.by(Sort.Direction.DESC, "createdDate"))
+    public List<CommentResponse> findAllComments(String type, String keyword) {
+        return commentRepository.findAll(type, keyword)
                 .stream()
                 .map(CommentResponse::new)
                 .collect(Collectors.toList());
     }
 
-    public CommentUpdate updateComment(CommentUpdate commentUpdate, Long commentId, Long memberId) {
-        memberRepository.findById(memberId).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_USER));
+    public Comment updateComment(CommentUpdate commentUpdate, Long commentId, Long memberId) {
+        Optional<Comment> comment = commentRepository.findBy(commentId, memberId);
 
-        Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
+        if (comment.isEmpty())
+            throw new CustomException(ErrorCode.INVALID_USER);
 
-        comment.setContent(commentUpdate.getContent());
-        commentRepository.save(comment);
+        Comment updated = comment.get();
 
-        return commentUpdate;
+        if (commentUpdate.getContent() != null)
+            updated.setContent(commentUpdate.getContent());
+
+        commentRepository.save(updated);
+        return updated;
+    }
+
+    @Transactional
+    public void deleteComment(Long commentId, Long memberId) {
+        commentRepository.findBy(commentId, memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.INVALID_USER));
+
+        commentRepository.deleteBy(commentId, memberId);
     }
 }
