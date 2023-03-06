@@ -22,7 +22,7 @@ public class JwtTokenProvider {
 
     private String secretKey = "Q4NSl604sgyHJj1qwEkR3ycUeR4uUAt7WJraD7EN3O9DVM4yyYuHxMEbSF4XXyYJkal13eqgB0F7Bq4H";
 
-    private Long tokenValidTime = 240 * 60 * 1000L;
+    private Long tokenValidTime = 24 * 60 * 60 * 1000L;
 
     @PostConstruct
     protected void init() {
