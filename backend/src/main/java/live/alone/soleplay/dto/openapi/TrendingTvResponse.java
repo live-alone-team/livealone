@@ -1,19 +1,16 @@
-package live.alone.soleplay.dto;
+package live.alone.soleplay.dto.openapi;
 
 import lombok.Data;
 
 @Data
-public class TvSearchResponse {
-    private int page;
+public class TrendingTvResponse {
     private Result[] results;
-    private int total_pages;
-    private int total_results;
 
     @Data
     static class Result {
-        private String original_name;
+        private int id;
+        private String name;
         private String overview;
-        private float popularity;
         private String poster_path;
         private String first_air_date;
         private float vote_average;

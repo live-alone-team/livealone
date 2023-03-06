@@ -1,4 +1,4 @@
-package live.alone.soleplay.dto;
+package live.alone.soleplay.dto.openapi;
 
 import lombok.Data;
 
@@ -22,7 +22,6 @@ public class YoutubeSearchResponse {
     @Data
     static class Snippet {
         private String title;
-        private String description;
         private Thumbnails thumbnails;
         private String channelTitle;
     }

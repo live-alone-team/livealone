@@ -1,17 +1,14 @@
-package live.alone.soleplay.dto;
+package live.alone.soleplay.dto.openapi;
 
 import lombok.Data;
 
 @Data
 public class TrendingMovieResponse {
-    private int page;
     private Result[] results;
-    private int total_pages;
-    private int total_results;
 
     @Data
     static class Result {
-        private String backdrop_path;
+        private int id;
         private String title;
         private String overview;
         private String poster_path;

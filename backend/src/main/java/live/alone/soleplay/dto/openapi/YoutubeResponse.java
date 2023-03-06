@@ -1,12 +1,10 @@
-package live.alone.soleplay.dto;
+package live.alone.soleplay.dto.openapi;
 
 import lombok.Data;
 
 @Data
 public class YoutubeResponse {
     private Item[] items;
-    private String nextPageToken;
-    private PageInfo pageInfo;
 
     @Data
     static class Item {
@@ -15,11 +13,9 @@ public class YoutubeResponse {
 
     @Data
     static class Snippet {
-        private String channelId;
         private String title;
         private Thumbnails thumbnails;
         private String channelTitle;
-        private String categoryId;
     }
 
     @Data
@@ -32,11 +28,5 @@ public class YoutubeResponse {
         private String url;
         private int width;
         private int height;
-    }
-
-    @Data
-    static class PageInfo {
-        private int totalResults;
-        private int resultsPerPage;
     }
 }
