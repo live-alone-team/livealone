@@ -9,7 +9,7 @@ const Profile = () => {
 
   const handlePress = async () => {
     try {
-      const response = await fetch('http://172.30.1.49:8080/register', {
+      const response = await fetch('http://192.168.200.138:8080/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
