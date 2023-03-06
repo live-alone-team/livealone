@@ -1,8 +1,7 @@
 package live.alone.soleplay.config;
 
-import live.alone.soleplay.dto.openapi.MovieSearchResponse;
-import live.alone.soleplay.dto.openapi.TrendingMovieResponse;
-
+import live.alone.soleplay.dto.openapi.TrendingTvResponse;
+import live.alone.soleplay.dto.openapi.TvSearchResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -10,32 +9,30 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-@Service
 @RequiredArgsConstructor
-public class MovieApiClient {
+@Service
+public class TvApiClient {
     private final RestTemplate restTemplate;
 
-
     private final String TMDB_KEY = "3201b7c0835e166642b793c241b359e4";
-    private final String trendingMovieUrl = "https://api.themoviedb.org/3/trending/movie/week?region=ko-KR&language=ko-KR&api_key=" + TMDB_KEY;
-    private final String movieSearchUrl = "https://api.themoviedb.org/3/search/movie?region=ko-KR&language=ko-KR&query={keyword}&api_key=" + TMDB_KEY;
+    private final String trendingTvUrl = "https://api.themoviedb.org/3/trending/tv/week?region=ko-KR&language=ko-KR&api_key=" + TMDB_KEY;
+    private final String tvSearchUrl = "https://api.themoviedb.org/3/search/tv?language=ko-KR&query={keyword}&api_key=" + TMDB_KEY;
 
-    public TrendingMovieResponse getTrendingMovies() {
+    public TrendingTvResponse getTrendingTvShows() {
         final HttpHeaders httpHeaders = new HttpHeaders();
         final HttpEntity<String> entity = new HttpEntity<>(httpHeaders);
 
         return restTemplate
-                .exchange(trendingMovieUrl, HttpMethod.GET, entity, TrendingMovieResponse.class)
+                .exchange(trendingTvUrl, HttpMethod.GET, entity, TrendingTvResponse.class)
                 .getBody();
     }
 
-     public MovieSearchResponse searchMovies(String keyword) {
+    public TvSearchResponse searchTv(String keyword) {
         final HttpHeaders httpHeaders = new HttpHeaders();
         final HttpEntity<String> entity = new HttpEntity<>(httpHeaders);
 
         return restTemplate
-                .exchange(movieSearchUrl, HttpMethod.GET, entity, MovieSearchResponse.class, keyword)
+                .exchange(tvSearchUrl, HttpMethod.GET, entity, TvSearchResponse.class, keyword)
                 .getBody();
     }
-
 }
