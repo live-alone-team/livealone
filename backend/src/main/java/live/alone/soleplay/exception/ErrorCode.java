@@ -13,7 +13,7 @@ public enum ErrorCode {
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."),
     ALREADY_EXISTS_EMAIL(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다."),
     ALREADY_EXISTS_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
-    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
+    PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     INVALID_USER(HttpStatus.UNAUTHORIZED, "접근 권한이 없는 유저입니다."),
 
     // COMMUNITY
@@ -23,6 +23,8 @@ public enum ErrorCode {
     // POLL
     EXPIRED_DATE(HttpStatus.BAD_REQUEST, "날짜가 만료되어 투표할 수 없습니다."),
     NOT_FOUND_POLL(HttpStatus.NOT_FOUND, "해당 투표 게시글이 없습니다."),
+    ALREADY_VOTED(HttpStatus.ALREADY_REPORTED, "이미 투표하였습니다."),
+    CANNOT_CAST(HttpStatus.BAD_REQUEST, "본인은 투표할 수 없습니다."),
 
     // COMMENT
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, "해당 댓글이 없습니다."),
