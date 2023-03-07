@@ -19,11 +19,6 @@ public class AuthController {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @GetMapping("/api/test")
-    public String hello() {
-        return "HELLO WORLD";
-    }
-
     @PostMapping("/register")
     public ResponseEntity<Member> register(@RequestBody RegisterRequest registerRequest) {
         return ResponseEntity.ok(memberService.register(registerRequest));
