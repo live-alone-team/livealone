@@ -43,7 +43,7 @@ public class MemberService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         if (!passwordEncoder.matches(logInRequest.getPassword(), member.getPassword()))
-            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+            throw new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
 
         return member;
     }
