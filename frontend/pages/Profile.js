@@ -11,46 +11,20 @@ const Profile = () => {
     try {
       const response = await fetch('http://192.168.200.138:8080/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          nickname
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, nickname })
       });
-      
       const json = await response.json();
       console.log(json);
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (error) { console.error(error); }
   };
 
   return (
     <View style={{paddingTop: 42, padding: 40}}>
-      <TextInput
-        value={name}
-        onChangeText={setName}
-        placeholder="Enter name"
-      />
-      <TextInput
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Enter email"
-      />
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Enter password"
-      />
-      <TextInput
-        value={nickname}
-        onChangeText={setNickname}
-        placeholder="Enter nickname"
-      />
+      <TextInput value={name} onChangeText={setName} placeholder="Enter name" />
+      <TextInput value={email} onChangeText={setEmail} placeholder="Enter email" />
+      <TextInput value={password} onChangeText={setPassword} placeholder="Enter password" />
+      <TextInput value={nickname} onChangeText={setNickname} placeholder="Enter nickname" />
       <Button title="Submit" onPress={handlePress} />
     </View>
   );

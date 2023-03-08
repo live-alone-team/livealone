@@ -1,47 +1,62 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import { WebView } from 'react-native-webview';
 import Swiper from 'react-native-swiper';
 
-// const handlePress = async () => {
-//   try {
-//     const response = await fetch('http://192.168.200.138:8080//user/chart/movies', {
-//       method: 'GET',
-//       headers: {
-//         'Content-Type': 'application/json'
-//       },
-//       body: JSON.stringify({})
-//     });
-    
-//     const json = await response.json();
-//     console.log(json);
-//   } catch (error) { 
-//     console.error(error);
-//   }
-// };
+const Recommend = () => {
+  const [liked, setLiked] = useState(false);
+  const [state, setState] = useState({
+    movieTitle: [],
+    movieImage: [],
+    movieNum:[]
+  });
 
-fetch("http://192.168.200.138:8080//user/chart/movies"),{
-  method: 'GET',
-  headers: {
-    'Content-Type': 'application/json',
-    'X-AUTH-TOKEN': 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlZGR5QGdtYWlsLmNvbSIsInJvbGVzIjoiUk9MRV9VU0VSIiwiaWF0IjoxNjc3OTA4NTU1LCJleHAiOjE2Nzc5OTQ5NTV9.oIeJoZmSCCy1hphBF9uMfaT_THslFuy22RB3NlEaFWE'
-  },
-}
-  .then((response) => response.json())
-  .then((data) => console.log(data));
+  const handlePress = async () => {
+    try {
+      const response = await fetch('http://192.168.0.33:8080/user/chart/movies', {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-TOKEN": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsaXZlQWxvbmVAZ21haWwuY29tIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE2NzgyNjQ1ODEsImV4cCI6MTY3ODM1MDk4MX0.DX75FlN9VhdxjqJ409eKJxlhA80iE9uzx37LxGp2D0c"
+        },
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        let [movieTitle, movieImage, movieNum] = [[],[],[]];
+        data.results.map((movie,i) => {
+          movieTitle.push(movie.title);
+          movieImage.push(`https://image.tmdb.org/t/p/w500${movie.poster_path}`);
+          movieNum.push(i);
+        })
+        setState({ 
+          movieTitle: state.movieTitle,
+          movieImage: state.movieImage,
+          movieNum: state.movieNum
+        });
+      }) 
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-export default function Recommend() {
+  useEffect(() => {
+    handlePress(); 
+  }, []);
+
   return (
+    
     <View style={styles.container}>
       {/* 추천 , 검색 */}
       <View>
         <View style={styles.header} />
         <View style={styles.topTitle}>
           <Text style={{fontWeight: 'bold', fontSize: 18}}>추천</Text>
-          <Image source={require('./../assets/images/search-icon.png')} />
+          <TouchableOpacity onPress={() => setLiked(!liked)}>
+            <Image source={require('./../assets/images/search-icon.png')} />
+          </TouchableOpacity>
         </View>
       </View>
-      
       {/* 유튜브 추천 리뷰 */}
       <View>
         <Text style={{fontWeight: 'bold', fontSize: 18, paddingLeft: 20, paddingBottom: 13}}>유튜브 추천 리뷰</Text>
@@ -54,20 +69,33 @@ export default function Recommend() {
             autoplayTimeout={2.5}
             buttonWrapperStyle={{paddingHorizontal: 15}}
           >
-            <View style={styles.slideContainer}>
-              <View style={styles.slide} />
-              <View style={{width: '5%'}} />
-              <View style={styles.slide} />
-              <View style={{width: '5%'}} />
-              <View style={styles.slide} />
-            </View>
-            <View style={styles.slideContainer}>
-              <View style={styles.slide} />
-              <View style={{width: '5%'}} />
-              <View style={styles.slide} />
-              <View style={{width: '5%'}} />
-              <View style={styles.slide} />
-            </View>
+            {/* 1 ~ 20 => 1 2 3  4 5 6 */}
+            {state.movieImage.map((e,i) => (
+              (i+1) <= 12  
+                ? (i+1) % 3 == 1 
+                    ? <View style={styles.slideContainer}> 
+                      <Image
+                        style={ styles.slide }
+                        source={{ uri: state.movieImage[i] }}
+                      /> 
+                      <View style={{width: '5%'}} />
+                    : null
+                  (i+1) % 3 == 2 
+                    ? <Image
+                        style={ styles.slide }
+                        source={{ uri: state.movieImage[i] }}
+                      /> 
+                      <View style={{width: '5%'}} />
+                    : null
+                  (i+1) % 3 == 0 
+                    ? <Image
+                        style={ styles.slide }
+                        source={{ uri: state.movieImage[i] }}
+                      />
+                      </View> 
+                    : null        
+                : null
+            ))}
           </Swiper>
         </View>
       </View>
@@ -106,4 +134,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'gray',
     borderRadius: 5,
   },
-});
+})
+
+export default Recommend;
