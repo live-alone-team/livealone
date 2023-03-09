@@ -51,7 +51,7 @@ const TabNavigator = createMaterialBottomTabNavigator(
       Vote: { 
         screen: Vote,  
         navigationOptions:{  
-          tabBarLabel:'투표',  
+          tabBarLabel:'투표 추가',  
           tabBarIcon: ({  }) => (  
             <View>  
                   {/* <Icon style={[{color: tintColor}]} size={25} name={'add-circle-outline'}/>   */}
@@ -65,7 +65,7 @@ const TabNavigator = createMaterialBottomTabNavigator(
       Recommend: { 
         screen: Recommend,  
         navigationOptions:{  
-          tabBarLabel:'추천',  
+          tabBarLabel:'투표',  
           tabBarIcon: ({  }) => (  
             <View>  
                   {/* <Icon style={[{color: tintColor}]} size={25} name={'chatbubbles-outline'}/>   */}
