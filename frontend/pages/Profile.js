@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, TextInput, View } from 'react-native';
+import {IP} from '@env';
 
 const Profile = () => {
   const [name, setName] = useState('');
@@ -9,7 +10,7 @@ const Profile = () => {
 
   const handlePress = async () => {
     try {
-      const response = await fetch('http://192.168.200.138:8080/register', {
+      const response = await fetch(`http://${IP}:8080/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, nickname })
