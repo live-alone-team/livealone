@@ -46,10 +46,6 @@ public class Poll extends BaseTimeEntity {
     @Column
     private int status;
 
-    public void addChoice(Choice choice) {
-        this.choices.add(choice);
-    }
-
     public void removeChoice(Choice choice) {
         choices.remove(choice);
         choice.setPoll(null);
