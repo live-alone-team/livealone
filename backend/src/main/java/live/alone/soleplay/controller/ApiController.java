@@ -38,14 +38,12 @@ public class ApiController {
             return ResponseEntity.ok(youTubeApiClient.searchOnYoutube(keyword));
     }
 
-    /*public String getDetailTV(String title) {
-        tvApiClient.searchTv(title);
-
+    @GetMapping("/{type}/{id}")
+    public ResponseEntity<?> getDetails(@PathVariable String type, @PathVariable Long id) {
+        if (type.equals("movies"))
+            return ResponseEntity.ok(movieApiClient.getMovieDetails(id));
+        else
+            return ResponseEntity.ok(tvApiClient.getTvDetails(id));
     }
-
-    public void getId() {
-        TvSearchResponse tvSearchResponse = new TvSearchResponse();
-        System.out.println(tvSearchResponse.getResults());
-    }*/
 
 }
