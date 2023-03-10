@@ -25,6 +25,7 @@ public enum ErrorCode {
     NOT_FOUND_POLL(HttpStatus.NOT_FOUND, "해당 투표 게시글이 없습니다."),
     ALREADY_VOTED(HttpStatus.ALREADY_REPORTED, "이미 투표하였습니다."),
     CANNOT_CAST(HttpStatus.BAD_REQUEST, "본인은 투표할 수 없습니다."),
+    NO_SUCH_POLL(HttpStatus.NOT_FOUND, "검색 결과가 없습니다."),
 
     // COMMENT
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, "해당 댓글이 없습니다."),
