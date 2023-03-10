@@ -1,6 +1,7 @@
 package live.alone.soleplay.config;
 
 import live.alone.soleplay.dto.openapi.TrendingTvResponse;
+import live.alone.soleplay.dto.openapi.TvDetailResponse;
 import live.alone.soleplay.dto.openapi.TvSearchResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -17,7 +18,7 @@ public class TvApiClient {
     private final String TMDB_KEY = "3201b7c0835e166642b793c241b359e4";
     private final String trendingTvUrl = "https://api.themoviedb.org/3/trending/tv/week?region=ko-KR&language=ko-KR&api_key=" + TMDB_KEY;
     private final String tvSearchUrl = "https://api.themoviedb.org/3/search/tv?language=ko-KR&query={keyword}&api_key=" + TMDB_KEY;
-
+    private final String tvDetailsUrl = "https://api.themoviedb.org/3/tv/{id}?language=ko-KR&api_key=" + TMDB_KEY;
     public TrendingTvResponse getTrendingTvShows() {
         final HttpHeaders httpHeaders = new HttpHeaders();
         final HttpEntity<String> entity = new HttpEntity<>(httpHeaders);
@@ -33,6 +34,15 @@ public class TvApiClient {
 
         return restTemplate
                 .exchange(tvSearchUrl, HttpMethod.GET, entity, TvSearchResponse.class, keyword)
+                .getBody();
+    }
+
+    public TvDetailResponse getTvDetails(Long id) {
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        final HttpEntity<String> entity = new HttpEntity<>(httpHeaders);
+
+        return restTemplate
+                .exchange(tvDetailsUrl, HttpMethod.GET, entity, TvDetailResponse.class, id)
                 .getBody();
     }
 }
