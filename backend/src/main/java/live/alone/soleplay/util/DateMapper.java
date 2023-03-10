@@ -9,6 +9,11 @@ import java.util.Date;
 
 public class DateMapper {
     public static String calculateTime(LocalDateTime expirationDate) {
+        String expiration;
+
+        if (expirationDate.isBefore(LocalDateTime.now()))
+            return "마감";
+
         int min, hour, day;
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -24,15 +29,24 @@ public class DateMapper {
             throw new RuntimeException(e);
         }
 
-        String expiration = "";
-        if (day > 0)
-            expiration = (day + 1) + "일 남음";
-        else {
-            if (min > 0)
-                expiration = hour + "시간 " + min + "분 남음";
+        if (min == 0) {
+            if (hour == 0 && day > 0)
+                expiration = day + "일 남음";
+            else if (hour > 0 && day == 0)
+                expiration = hour + "시간 남음";
             else
-                expiration = min + "분 남음";
+                expiration = day + "일 " + hour + "시간 남음";
         }
+        else if (hour == 0) {
+            if (min > 0 && day == 0)
+                expiration = min + "분 남음";
+            else
+                expiration = day + "일 " + min + "분 남음";
+        }
+        else if (day == 0)
+            expiration = hour + "시간 " + min + "분 남음";
+        else
+            expiration = day + "일 " + hour + "시간 " + min + "분 남음";
         return expiration;
     }
 }
