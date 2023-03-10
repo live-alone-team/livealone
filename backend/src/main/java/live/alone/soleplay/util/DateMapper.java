@@ -25,25 +25,14 @@ public class DateMapper {
         }
 
         String expiration = "";
-        if (min == 0) {
-            if (hour == 0 && day > 0)
-                expiration = day + "일 남음";
-            else if (hour > 0 && day == 0)
-                expiration = hour + "시간 남음";
+        if (day > 0)
+            expiration = (day + 1) + "일 남음";
+        else {
+            if (min > 0)
+                expiration = hour + "시간 " + min + "분 남음";
             else
-                expiration = day + "일 " + hour + "시간 남음";
-        }
-        else if (hour == 0) {
-            if (min > 0 && day == 0)
                 expiration = min + "분 남음";
-            else
-                expiration = day + "일 " + min + "분 남음";
         }
-        else if (day == 0)
-            expiration = hour + "시간 " + min + "분 남음";
-        else
-            expiration = day + "일 " + hour + "시간 " + min + "분 남음";
-
         return expiration;
     }
 }
