@@ -26,4 +26,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "where p.member.id = :memberId " +
             "order by p.createdDate desc")
     List<Poll> findPollHistory(@Param("memberId") Long memberId);
+
+    @Query("select p " +
+            "from Poll p left join Likes l on p.id = l.poll.id left join Member m on m.id = l.member.id " +
+            "where m.id = :memberId " +
+            "order by l.createdDate desc")
+    List<Poll> findLikedPolls(@Param("memberId") Long memberId);
 }

@@ -43,6 +43,12 @@ public class MemberController {
         return ResponseEntity.ok(memberService.findPollHistory(memberId));
     }
 
+    @GetMapping("/profile/likes")
+    public ResponseEntity<List<PollHistoryResponse>> findLikedPolls(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long memberId = userDetails.getMember().getId();
+        return ResponseEntity.ok(memberService.findLikedPoll(memberId));
+    }
+
     @PostMapping("/profile/image")
     public ResponseEntity<Member> uploadProfile(@RequestPart MultipartFile file,
                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {

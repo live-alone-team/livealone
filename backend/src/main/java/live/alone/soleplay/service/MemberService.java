@@ -66,6 +66,12 @@ public class MemberService {
                 .collect(Collectors.toList());
     }
 
+    public List<PollHistoryResponse> findLikedPoll(Long memberId) {
+        return memberRepository.findLikedPolls(memberId).stream()
+                .map(PollHistoryResponse::new)
+                .collect(Collectors.toList());
+    }
+
     public Member updateProfile(MemberUpdateRequest memberUpdateRequest, Long memberId) {
         Optional<Member> member = memberRepository.findById(memberId);
 
