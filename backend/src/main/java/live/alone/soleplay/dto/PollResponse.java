@@ -20,13 +20,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class PollResponse {
     private Long pollId;
-    private String nickname;
-    private String profileImage;
-    private String title;
-    private String description;
     private List<ChoiceResponse> choices;
     private String expirationDate;
-    private String createdDate;
     private boolean isExpired;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
