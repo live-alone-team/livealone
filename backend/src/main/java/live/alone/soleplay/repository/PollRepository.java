@@ -1,9 +1,10 @@
 package live.alone.soleplay.repository;
 
 import live.alone.soleplay.entity.Poll;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,14 +15,9 @@ public interface PollRepository extends JpaRepository<Poll, Long> {
 
     Optional<Poll> findById(Long pollId);
 
-    //Page<Poll> findAll(Long memberId, Pageable pageable);
+    @Modifying
+    @Query("delete from Poll p where p.id=:pollId and p.member.id=:memberId")
+    void deleteById(@Param("pollId") Long pollId, @Param("memberId") Long memberId);
 
-    //long countByCreatedBy(Long memberId);
-
-    List<Poll> findByIdIn(List<Long> pollId);
-
-    List<Poll> findByIdIn(List<Long> pollId, Sort sort);
-
-    @Query("select p.title, p.createdDate from Poll p where p.member.id = :memberId")
-    List<Poll> findAllBy(Long memberId);
+    List<Poll> findByTitleContainingOrderByCreatedDateDesc(String keyword);
 }
