@@ -48,9 +48,11 @@ public class PollController {
         return ResponseEntity.ok(pollService.castVoteAndGetUpdatedPoll(pollId, voteRequest, memberId));
     }
 
-    @PatchMapping("/{pollId}/{memberId}")
-    public ResponseEntity<Poll> updatePoll(@RequestBody PollRequest pollRequest, @PathVariable Long pollId,
-                                           @PathVariable Long memberId) {
+    @PatchMapping("/{pollId}")
+    public ResponseEntity<Poll> updatePoll(@RequestBody PollRequest pollRequest,
+                                           @PathVariable Long pollId,
+                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long memberId = userDetails.getMember().getId();
         return ResponseEntity.ok(pollService.updatePoll(pollRequest, pollId, memberId));
     }
 
