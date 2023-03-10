@@ -26,6 +26,6 @@ public class CommentResponse {
         this.type = comment.getType();
         this.title = comment.getTitle();
         this.content = comment.getContent();
-        this.createdDate = comment.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        this.createdDate = comment.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
     }
 }
