@@ -13,7 +13,7 @@ public class PollHistoryResponse {
 
     public PollHistoryResponse(Poll poll) {
         this.title = poll.getTitle();
-        this.createdDate = poll.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        this.createdDate = poll.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
     }
 
 }
