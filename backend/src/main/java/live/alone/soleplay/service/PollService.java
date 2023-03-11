@@ -4,31 +4,32 @@ import live.alone.soleplay.dto.*;
 import live.alone.soleplay.entity.*;
 import live.alone.soleplay.exception.CustomException;
 import live.alone.soleplay.exception.ErrorCode;
+import live.alone.soleplay.repository.LikesRepository;
 import live.alone.soleplay.repository.MemberRepository;
 import live.alone.soleplay.repository.PollRepository;
 import live.alone.soleplay.repository.VoteRepository;
+import live.alone.soleplay.util.DateMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static live.alone.soleplay.util.DateMapper.calculateTime;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class PollService {
-
     private final PollRepository pollRepository;
     private final VoteRepository voteRepository;
     private final MemberRepository memberRepository;
+    private final LikesRepository likesRepository;
 
-    public PollRequest createPollAndChoice(PollRequest pollRequest, Long memberId) {
+    public PollRequest createPoll(PollRequest pollRequest, Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
         LocalDateTime expirationDate = LocalDateTime.now()
@@ -38,7 +39,6 @@ public class PollService {
         List<ChoiceRequest> choiceRequests = pollRequest.getChoices();
         List<Choice> choices = new ArrayList<>();
         Poll poll = new Poll(member, pollRequest.getTitle(), pollRequest.getDescription(), expirationDate, 1);
-
 
         for (ChoiceRequest choiceRequest : choiceRequests) {
             Choice choice = new Choice(choiceRequest.getContent());
@@ -55,15 +55,24 @@ public class PollService {
 
     @Transactional(readOnly = true)
     public List<PollListResponse> findAllPolls() {
-        return pollRepository.findAll().stream()
-                .map(PollListResponse::new)
-                .collect(Collectors.toList());
-    }
+        List<Poll> polls = pollRepository.findAll(Sort.by(Sort.Direction.DESC, "createdDate"));
+        List<PollListResponse> pollListResponses = new ArrayList<>();
 
-    public List<ProfileListResponse> findPollsBy(Long id) {
-        return pollRepository.findAllBy(id).stream()
-                .map(ProfileListResponse::new)
-                .collect(Collectors.toList());
+        for (Poll poll : polls) {
+            PollListResponse pollListResponse = PollListResponse.builder()
+                    .pollId(poll.getId())
+                    .image(poll.getMember().getImage())
+                    .nickname(poll.getMember().getNickname())
+                    .title(poll.getTitle())
+                    .description(poll.getDescription())
+                    .expirationDate(DateMapper.calculateTime(poll.getExpirationDate()))
+                    .totalLikes(likesRepository.sumLikes(poll.getId()))
+                    .totalVotes(voteRepository.countByPollId(poll.getId()))
+                    .createdTime(poll.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")))
+                    .build();
+            pollListResponses.add(pollListResponse);
+        }
+        return pollListResponses;
     }
 
     public PollResponse castVoteAndGetUpdatedPoll(Long pollId, VoteRequest voteRequest, Long memberId) {
@@ -85,7 +94,11 @@ public class PollService {
         vote.setMember(member);
         vote.setPoll(poll);
 
-        voteRepository.save(vote);
+        try {
+            vote = voteRepository.save(vote);
+        } catch (Exception exception) {
+            throw new CustomException(ErrorCode.ALREADY_VOTED);
+        }
 
         // 여기서부터 투표 결과 반환
 
@@ -94,59 +107,14 @@ public class PollService {
         Map<Long, Long> choiceVoteMap = voteCounts.stream()
                 .collect(Collectors.toMap(ChoiceVoteCount::getChoiceId, ChoiceVoteCount::getVoteCount));
 
+        return mapPoll(poll, choiceVoteMap, vote.getChoice().getId());
+    }
+
+    public static PollResponse mapPoll(Poll poll, Map<Long, Long> choiceVoteMap, Long vote) {
         PollResponse pollResponse = new PollResponse();
         pollResponse.setPollId(poll.getId());
-        pollResponse.setProfileImage(poll.getMember().getImage());
-        pollResponse.setTitle(poll.getTitle());
-        pollResponse.setDescription(poll.getDescription());
-        pollResponse.setNickname(poll.getMember().getNickname());
 
-        int min, hour, day;
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try {
-            String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            String end = poll.getExpirationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            Date today = dateFormat.parse(now);
-            Date d2 = dateFormat.parse(end);
-            min = (int) (((d2.getTime() - today.getTime()) / 60000) % 60);
-            hour = (int) ((d2.getTime() - today.getTime()) / 3600000) % 24;
-            day = (int) (((d2.getTime() - today.getTime()) / 1000) / (24 * 60 * 60)) & 365;
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        String expiration = "";
-        if (min == 0) {
-            if (hour == 0 && day > 0)
-                expiration = day + "일 남음";
-            else if (hour > 0 && day == 0)
-                expiration = hour + "시간 남음";
-            else
-                expiration = day + "일 " + hour + "시간 남음";
-        }
-        else if (hour == 0) {
-            if (min == 0 && day > 0)
-                expiration = day + "일 남음";
-            else if (min > 0 && day == 0)
-                expiration = min + "분 남음";
-            else
-                expiration = day + "일 " + min + "분 남음";
-        }
-        else if (day == 0) {
-            if (min == 0 && hour > 0)
-                expiration = hour + "시간 남음";
-            else if (min > 0 && hour == 0)
-                expiration = min + "분 남음";
-            else
-                expiration = hour + "시간 " + min + "분 남음";
-        }
-        else
-            expiration = day + "일 " + hour + "시간 " + min + "분 남음";
-
-        String createdDate = poll.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-
-        pollResponse.setExpirationDate(expiration);
-        pollResponse.setCreatedDate(createdDate);
+        pollResponse.setExpirationDate(calculateTime(poll.getExpirationDate()));
         pollResponse.setExpired(poll.getExpirationDate().isBefore(LocalDateTime.now()));
 
         List<ChoiceResponse> choiceResponses = poll.getChoices().stream().map(choice -> {
@@ -159,13 +127,14 @@ public class PollService {
             } else {
                 choiceResponse.setVoteCount(0);
             }
+
             return choiceResponse;
         }).collect(Collectors.toList());
 
         pollResponse.setChoices(choiceResponses);
 
-        if (vote.getChoice().getId() != null)
-            pollResponse.setSelectedChoice(vote.getChoice().getId());
+        if (vote != null)
+            pollResponse.setSelectedChoice(vote);
 
         long totalVotes = pollResponse.getChoices().stream().mapToLong(ChoiceResponse::getVoteCount).sum();
         pollResponse.setTotalVotes(totalVotes);
@@ -174,20 +143,19 @@ public class PollService {
     }
 
     @Transactional
-    public void deletePoll(Long pollId) {
-        Poll poll = pollRepository.findById(pollId)
-                .orElseThrow(
-                        () -> new CustomException(ErrorCode.NOT_FOUND_POLL));
-        pollRepository.delete(poll);
+    public void deletePoll(Long pollId, Long memberId) {
+        pollRepository.findById(pollId).orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_POLL));
+        pollRepository.deleteById(pollId, memberId);
     }
 
-    // 날짜 수정 아직 안됨
+    // 수정 아직 안됨
     public Poll updatePoll(PollRequest pollRequest, Long pollId, Long memberId) {
         Optional<Poll> poll = pollRepository.findById(pollId);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        if (member.getId() != poll.get().getMember().getId())
+        if (!member.getId().equals(poll.get().getMember().getId()))
             throw new CustomException(ErrorCode.INVALID_USER);
 
         if (poll.isEmpty())
@@ -203,5 +171,77 @@ public class PollService {
         pollRepository.save(updatedPoll);
 
         return updatedPoll;
+    }
+
+    public List<PollSearchList> getPollContaining(String keyword) {
+        List<Poll> polls = pollRepository.findByTitleContainingOrderByCreatedDateDesc(keyword);
+        if (polls.size() == 0)
+            throw new CustomException(ErrorCode.NO_SUCH_POLL);
+
+        List<PollSearchList> pollSearchLists = new ArrayList<>();
+
+        for (Poll poll : polls) {
+            PollSearchList pollSearchList = PollSearchList.builder()
+                    .id(poll.getId())
+                    .title(poll.getTitle())
+                    .description(poll.getDescription())
+                    .createdDate(poll.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")))
+                    .build();
+            pollSearchLists.add(pollSearchList);
+        }
+        return pollSearchLists;
+    }
+
+    public String likeOnPoll(Long pollId, Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        Poll poll = pollRepository.findById(pollId).orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_POLL));
+
+        Optional<Likes> like = likesRepository.findLike(pollId, memberId);
+
+        String command;
+        if (like.isEmpty()) {
+            Likes savedLike = new Likes(poll, member, 1);
+            likesRepository.save(savedLike);
+             command = "to like";
+        }
+        else{
+            likesRepository.deleteLike(pollId, memberId);
+            command = "to delete";
+        }
+        return "success " + command;
+    }
+
+    public PollResponseDetail getPollBy(Long pollId) {
+        Poll poll = pollRepository.findById(pollId).orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_POLL));
+
+        PollResponseDetail responseDetail = new PollResponseDetail();
+        responseDetail.setNickname(poll.getMember().getNickname());
+        responseDetail.setProfileImage(poll.getMember().getImage());
+        responseDetail.setTitle(poll.getTitle());
+        responseDetail.setDescription(poll.getDescription());
+
+        if (poll.getExpirationDate().isBefore(LocalDateTime.now()))
+            responseDetail.setExpirationDate("마감");
+        else
+            responseDetail.setExpirationDate(calculateTime(poll.getExpirationDate()));
+        responseDetail.setCreatedDate(poll.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
+        responseDetail.setExpired(poll.getExpirationDate().isBefore(LocalDateTime.now()));
+
+        List<ChoiceResponse> choiceResponses = poll.getChoices().stream().map(choice -> {
+            ChoiceResponse choiceResponse = new ChoiceResponse();
+            choiceResponse.setId(choice.getId());
+            choiceResponse.setContent(choice.getContent());
+
+            return choiceResponse;
+        }).collect(Collectors.toList());
+
+        responseDetail.setChoices(choiceResponses);
+        responseDetail.setTotalLikes(likesRepository.sumLikes(pollId));
+        responseDetail.setTotalVotes(voteRepository.countByPollId(pollId));
+        return responseDetail;
     }
 }
