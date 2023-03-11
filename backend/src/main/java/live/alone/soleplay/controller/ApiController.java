@@ -1,14 +1,11 @@
 package live.alone.soleplay.controller;
 
-import live.alone.soleplay.config.MovieApiClient;
-import live.alone.soleplay.config.TvApiClient;
-import live.alone.soleplay.config.YouTubeApiClient;
-import live.alone.soleplay.dto.openapi.*;
+import live.alone.soleplay.config.openapi.MovieApiClient;
+import live.alone.soleplay.config.openapi.TvApiClient;
+import live.alone.soleplay.config.openapi.YouTubeApiClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
 
 @RequiredArgsConstructor
 @RequestMapping("/user")

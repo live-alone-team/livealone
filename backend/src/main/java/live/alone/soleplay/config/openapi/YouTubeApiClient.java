@@ -1,4 +1,4 @@
-package live.alone.soleplay.config;
+package live.alone.soleplay.config.openapi;
 
 import live.alone.soleplay.dto.openapi.YoutubeResponse;
 import live.alone.soleplay.dto.openapi.YoutubeSearchResponse;

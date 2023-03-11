@@ -1,4 +1,4 @@
-package live.alone.soleplay.config;
+package live.alone.soleplay.config.openapi;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
