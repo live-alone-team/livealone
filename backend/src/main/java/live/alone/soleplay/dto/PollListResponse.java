@@ -1,30 +1,34 @@
 package live.alone.soleplay.dto;
 
-import live.alone.soleplay.entity.Poll;
-import live.alone.soleplay.util.DateMapper;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class PollListResponse {
+    private Long pollId;
     private String image;
     private String nickname;
     private String title;
     private String description;
+    private long totalLikes;
+    private long totalVotes;
     private String expirationDate;
     private String createdTime;
 
-    public PollListResponse(Poll poll) {
-        this.image = poll.getMember().getImage();
-        this.nickname = poll.getMember().getNickname();
-        this.title = poll.getTitle();
-        this.description = poll.getDescription();
-        this.expirationDate = DateMapper.calculateTime(poll.getExpirationDate());
-        this.createdTime = poll.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+    @Builder
+    public PollListResponse(Long pollId, String image, String nickname, String title, String description, long totalLikes, long totalVotes, String expirationDate, String createdTime) {
+        this.pollId = pollId;
+        this.image = image;
+        this.nickname = nickname;
+        this.title = title;
+        this.description = description;
+        this.totalLikes = totalLikes;
+        this.totalVotes = totalVotes;
+        this.expirationDate = expirationDate;
+        this.createdTime = createdTime;
     }
 }
