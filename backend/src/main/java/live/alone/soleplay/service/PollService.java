@@ -220,4 +220,41 @@ public class PollService {
         responseDetail.setTotalVotes(voteRepository.countByPollId(pollId));
         return responseDetail;
     }
+
+    public PollResponse getPollResult(Long pollId) {
+        Poll poll = pollRepository.findById(pollId).orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_POLL));
+
+        List<ChoiceVoteCount> voteCounts = voteRepository.countByPollIdGroupByChoiceId(pollId);
+
+        Map<Long, Long> choiceVoteMap = voteCounts.stream()
+                .collect(Collectors.toMap(ChoiceVoteCount::getChoiceId, ChoiceVoteCount::getVoteCount));
+
+        PollResponse pollResponse = new PollResponse();
+        pollResponse.setPollId(poll.getId());
+
+        pollResponse.setExpirationDate(calculateTime(poll.getExpirationDate()));
+        pollResponse.setExpired(poll.getExpirationDate().isBefore(LocalDateTime.now()));
+
+        List<ChoiceResponse> choiceResponses = poll.getChoices().stream().map(choice -> {
+            ChoiceResponse choiceResponse = new ChoiceResponse();
+            choiceResponse.setId(choice.getId());
+            choiceResponse.setContent(choice.getContent());
+
+            if (choiceVoteMap.containsKey(choice.getId())) {
+                choiceResponse.setVoteCount(choiceVoteMap.get(choice.getId()));
+            } else {
+                choiceResponse.setVoteCount(0);
+            }
+
+            return choiceResponse;
+        }).collect(Collectors.toList());
+
+        pollResponse.setChoices(choiceResponses);
+
+        long totalVotes = pollResponse.getChoices().stream().mapToLong(ChoiceResponse::getVoteCount).sum();
+        pollResponse.setTotalVotes(totalVotes);
+
+        return pollResponse;
+    }
 }

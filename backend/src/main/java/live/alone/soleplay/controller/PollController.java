@@ -66,4 +66,9 @@ public class PollController {
         Long memberId = userDetails.getMember().getId();
         return ResponseEntity.ok(pollService.likeOnPoll(pollId, memberId));
     }
+
+    @GetMapping("/{pollId}/result")
+    public ResponseEntity<PollResponse> getPollResult(@PathVariable Long pollId) {
+        return ResponseEntity.ok(pollService.getPollResult(pollId));
+    }
 }
