@@ -149,30 +149,6 @@ public class PollService {
         pollRepository.deleteById(pollId, memberId);
     }
 
-    // 수정 아직 안됨
-    public Poll updatePoll(PollRequest pollRequest, Long pollId, Long memberId) {
-        Optional<Poll> poll = pollRepository.findById(pollId);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-
-        if (!member.getId().equals(poll.get().getMember().getId()))
-            throw new CustomException(ErrorCode.INVALID_USER);
-
-        if (poll.isEmpty())
-            throw new CustomException(ErrorCode.NOT_FOUND_POLL);
-
-        Poll updatedPoll = poll.get();
-
-        if (pollRequest.getTitle() != null)
-            updatedPoll.setTitle(pollRequest.getTitle());
-        else if (pollRequest.getDescription() != null)
-            updatedPoll.setDescription(pollRequest.getDescription());
-
-        pollRepository.save(updatedPoll);
-
-        return updatedPoll;
-    }
-
     public List<PollSearchList> getPollContaining(String keyword) {
         List<Poll> polls = pollRepository.findByTitleContainingOrderByCreatedDateDesc(keyword);
         if (polls.size() == 0)

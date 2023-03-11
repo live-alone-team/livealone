@@ -4,7 +4,6 @@ import live.alone.soleplay.config.jwt.UserDetailsImpl;
 import live.alone.soleplay.dto.PollListResponse;
 import live.alone.soleplay.dto.PollRequest;
 import live.alone.soleplay.dto.*;
-import live.alone.soleplay.entity.Poll;
 import live.alone.soleplay.service.PollService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -46,14 +45,6 @@ public class PollController {
                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Long memberId = userDetails.getMember().getId();
         return ResponseEntity.ok(pollService.castVoteAndGetUpdatedPoll(pollId, voteRequest, memberId));
-    }
-
-    @PatchMapping("/{pollId}")
-    public ResponseEntity<Poll> updatePoll(@RequestBody PollUpdateRequest pollUpdateRequest,
-                                           @PathVariable Long pollId,
-                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Long memberId = userDetails.getMember().getId();
-        return ResponseEntity.ok(pollService.updatePoll(pollUpdateRequest, pollId, memberId));
     }
 
     @DeleteMapping("/{pollId}")
