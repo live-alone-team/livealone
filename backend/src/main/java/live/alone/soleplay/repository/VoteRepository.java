@@ -2,8 +2,6 @@ package live.alone.soleplay.repository;
 
 import live.alone.soleplay.entity.ChoiceVoteCount;
 import live.alone.soleplay.entity.Vote;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,9 +24,6 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     @Query("SELECT v FROM Vote v where v.member.id = :memberId and v.poll.id = :pollId")
     Vote findByMemberIdAndPollId(@Param("memberId") Long memberId, @Param("pollId") Long pollId);
 
-    @Query("SELECT COUNT(v.id) from Vote v where v.member.id = :memberId")
-    long countByMemberId(@Param("memberId") Long memberId);
-
-    @Query("SELECT v.poll.id FROM Vote v WHERE v.member.id = :memberId")
-    Page<Long> findVotedPollIdsByMemberId(@Param("memberId") Long memberId, Pageable pageable);
+    @Query("SELECT coalesce(count(v.id), 0) from Vote v where v.poll.id = :pollId")
+    long countByPollId(@Param("pollId") Long pollId);
 }
