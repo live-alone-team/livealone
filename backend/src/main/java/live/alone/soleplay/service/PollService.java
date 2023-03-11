@@ -94,11 +94,10 @@ public class PollService {
         vote.setMember(member);
         vote.setPoll(poll);
 
-        try {
-            vote = voteRepository.save(vote);
-        } catch (Exception exception) {
+        if (voteRepository.countByMemberIdAndPollId(memberId, pollId) > 0)
             throw new CustomException(ErrorCode.ALREADY_VOTED);
-        }
+        else
+            voteRepository.save(vote);
 
         // 여기서부터 투표 결과 반환
 

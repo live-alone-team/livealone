@@ -21,8 +21,8 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     @Query("SELECT v FROM Vote v where v.member.id = :memberId and v.poll.id in :pollIds")
     List<Vote> findByMemberIdAndPollIdIn(@Param("memberId") Long memberId, @Param("pollIds") List<Long> pollIds);
 
-    @Query("SELECT v FROM Vote v where v.member.id = :memberId and v.poll.id = :pollId")
-    Vote findByMemberIdAndPollId(@Param("memberId") Long memberId, @Param("pollId") Long pollId);
+    @Query("SELECT count(v.id) FROM Vote v where v.member.id = :memberId and v.poll.id = :pollId")
+    long countByMemberIdAndPollId(@Param("memberId") Long memberId, @Param("pollId") Long pollId);
 
     @Query("SELECT coalesce(count(v.id), 0) from Vote v where v.poll.id = :pollId")
     long countByPollId(@Param("pollId") Long pollId);
