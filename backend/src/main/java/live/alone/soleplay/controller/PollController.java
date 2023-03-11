@@ -49,11 +49,11 @@ public class PollController {
     }
 
     @PatchMapping("/{pollId}")
-    public ResponseEntity<Poll> updatePoll(@RequestBody PollRequest pollRequest,
+    public ResponseEntity<Poll> updatePoll(@RequestBody PollUpdateRequest pollUpdateRequest,
                                            @PathVariable Long pollId,
                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Long memberId = userDetails.getMember().getId();
-        return ResponseEntity.ok(pollService.updatePoll(pollRequest, pollId, memberId));
+        return ResponseEntity.ok(pollService.updatePoll(pollUpdateRequest, pollId, memberId));
     }
 
     @DeleteMapping("/{pollId}")
@@ -71,7 +71,7 @@ public class PollController {
 
     @GetMapping("/like/{pollId}")
     public ResponseEntity<String> likeOnPoll(@PathVariable Long pollId,
-                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Long memberId = userDetails.getMember().getId();
         return ResponseEntity.ok(pollService.likeOnPoll(pollId, memberId));
     }
