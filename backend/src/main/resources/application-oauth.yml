@@ -4,6 +4,8 @@ spring:
       client:
         registration:
           google:
+            redirect-uri: http://localhost:8080/auth/google/callback
             client-id: 524300461042-npklhi4n136fro90egrg2fc39mqq7e81.apps.googleusercontent.com
             client-secret: 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
+            authorization-grant-type: authorization_code
             scope: profile,email
