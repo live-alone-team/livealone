@@ -2,8 +2,6 @@ package live.alone.soleplay.config;
 
 import live.alone.soleplay.config.jwt.JwtAuthenticationFilter;
 import live.alone.soleplay.config.jwt.JwtTokenProvider;
-import live.alone.soleplay.config.auth.CustomOAuth2UserService;
-import live.alone.soleplay.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +17,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -46,10 +43,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class);
-        http
-                .logout().logoutSuccessUrl("/")
-                .and()
-                .oauth2Login().userInfoEndpoint()
-                .userService(customOAuth2UserService);
     }
 }
