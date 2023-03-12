@@ -1,6 +1,5 @@
 package live.alone.soleplay.config;
 
-import live.alone.soleplay.config.auth.OAuth2AuthenticationSuccessHandler;
 import live.alone.soleplay.config.jwt.JwtAuthenticationFilter;
 import live.alone.soleplay.config.jwt.JwtTokenProvider;
 import live.alone.soleplay.config.auth.CustomOAuth2UserService;
@@ -20,7 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final MemberRepository memberRepository;
     private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
