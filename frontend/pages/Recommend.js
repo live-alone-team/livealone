@@ -1,13 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView} from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, SafeAreaView} from 'react-native';
 import Swiper from 'react-native-swiper';
 import {IP} from '@env';
+import RNPickerSelect from 'react-native-picker-select';
 
 const Recommend = () => {
   const [search, setSearch] = useState(false);
   const [visible, setVisible] = useState(false);
-
+  const [selectedValue, setSelectedValue] = useState(null);
   const [state, setState] = useState({ 
     movie: { title: [], image: [], num: [] },
     tv: { title: [], image: [], num: [] },
@@ -20,7 +21,7 @@ const Recommend = () => {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsaXZlQWxvbmVAZ21haWwuY29tIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE2NzgzMzk1NTIsImV4cCI6MTY3ODQyNTk1Mn0.8MEpJUHTSLVKumdbYdx9P2bRT27asjSrtXSaBuQvqmA"
+          "X-AUTH-TOKEN": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsaXZlQWxvbmVAZ21haWwuY29tIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE2Nzg1OTY4MTMsImV4cCI6MTY3ODY4MzIxM30.izF1Kicz7Id0BwMgF0pM-IwPKGxqRPc6qN8Ip0HM6fs"
         },
       })
       const data = await response.json();
@@ -90,77 +91,95 @@ const Recommend = () => {
         </View>
       </View>
       );
-    };  
+    };    
 
   return (
     
     <View style={styles.container}>
-      <View style={styles.header} />
-
-      <View style={{backgroundColor:'#FFFFFF'}}>
-        
-        {/* 타이틀 , 검색 */}
-        <View>
-          <View style={styles.topTitle}>
-            
-            {search ? (
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <TouchableOpacity onPress={() => setSearch(!search)}>
-                    <Image source={require('./../assets/images/arrow-right.png')}/>
-                  </TouchableOpacity>
-                  <View style={styles.searchBox}>
-                    <TouchableOpacity onPress={() => setVisible(!visible)}>
-                      <Image style={styles.searchGubun} source={require('./../assets/images/arrow-down.png')}/>
+      {/* iOS 11 이상이 설치된 아이폰에만 적용됨. */}
+      <SafeAreaView>
+        <View style={{backgroundColor:'#FFFFFF'}}>
+          
+          {/* 타이틀 , 검색 */}
+          <View>
+            <View style={styles.topTitle}>
+              
+              {search ? (
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <TouchableOpacity onPress={() => setSearch(!search)}>
+                      <Image source={require('./../assets/images/arrow-right.png')}/>
                     </TouchableOpacity>
+                    <View style={styles.searchBox}>
 
+                      <TouchableOpacity onPress={() => setVisible(!visible)}>
+                        {/* <Image style={styles.searchGubun} source={require('./../assets/images/arrow-down.png')}/> */}
+                        <View style={{marginLeft: 15, marginRight: 15, width: 34}}>
+                          <RNPickerSelect
+                            disabled={false}
+                            placeholder={{
+                              label: '선택',
+                              value: null
+                            }}
+                            visible={false}
+                            onValueChange={(value) => setSelectedValue(value)}
+                            items={[
+                              { label: '영화', value: 'movies' },
+                              { label: '드라마', value: 'tv' },
+                              { label: '유튜브', value: 'youtube' },
+                            ]}
+                          />
+                        </View>
+                      </TouchableOpacity>
 
-                    <View style={{ borderWidth: 0.5, height: 28, borderColor: '#D0D5DA' }} />
-                    <TextInput style={styles.searchBar} placeholder="검색어를 입력하세요" />
+                      <View style={{ borderWidth: 0.5, height: 28, borderColor: '#D0D5DA' }} />
+                      <TextInput style={styles.searchBar} placeholder="검색어를 입력하세요"/>
+                    </View>
                   </View>
-                </View>
-              ) : (
-                <Text style={{fontWeight: 'bold', fontSize: 18}}>나혼자산다</Text>
-              )}
+                ) : (
+                  <Text style={{fontWeight: 'bold', fontSize: 18}}>나혼자산다</Text>
+                )}
 
-            <TouchableOpacity onPress={() => setSearch(!search)}>
-              <Image source={require('./../assets/images/search-icon.png')} />
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => setSearch(!search)}>
+              {/* onPress={() => navigation.navigate('Profile', {data: 'Hello World!'})} */}
+                <Image source={require('./../assets/images/search-icon.png')} />
+              </TouchableOpacity>
+            </View>
           </View>
+
+          <ScrollView>
+            {/* 배너 */}
+            <View style={styles.banner}>
+              <Swiper
+                showsPagination={false}
+                showsButtons={true}
+                loop={true}
+                autoplay={true}
+                autoplayTimeout={2.5}
+                buttonWrapperStyle={{paddingHorizontal: 15}}
+                >
+                <Image style={styles.searchGubun} source={require('./../assets/images/banner1.png')}/>
+                <Image style={styles.searchGubun} source={require('./../assets/images/banner2.png')}/>
+              </Swiper>
+            </View>
+
+            {/* movie */}
+            {renderMedia("주간 인기 영화", state.movie, "movie")}
+        
+            <View style={{ height: 16, backgroundColor:'#EEEEEE' }} />
+
+            {/* tv */}
+            {renderMedia("주간 인기 드라마", state.tv, "tv")}
+
+            <View style={{ height: 16, backgroundColor:'#EEEEEE' }} />
+
+            {/* youtube */}
+            {renderMedia("YoutTube", state.youtube, "youtube")}
+
+            <View style={{ height: 110}} />
+
+          </ScrollView>
         </View>
-
-        <ScrollView>
-          {/* 배너 */}
-          <View style={styles.banner}>
-            <Swiper
-              showsPagination={false}
-              showsButtons={true}
-              loop={true}
-              autoplay={true}
-              autoplayTimeout={2.5}
-              buttonWrapperStyle={{paddingHorizontal: 15}}
-              >
-              <Image style={styles.searchGubun} source={require('./../assets/images/banner1.png')}/>
-              <Image style={styles.searchGubun} source={require('./../assets/images/banner2.png')}/>
-            </Swiper>
-          </View>
-
-          {/* movie */}
-          {renderMedia("주간 인기 영화", state.movie, "movie")}
-      
-          <View style={{ height: 16, backgroundColor:'#EEEEEE' }} />
-
-          {/* tv */}
-          {renderMedia("주간 인기 드라마", state.tv, "tv")}
-
-          <View style={{ height: 16, backgroundColor:'#EEEEEE' }} />
-
-          {/* youtube */}
-          {renderMedia("YoutTube", state.youtube, "youtube")}
-
-          <View style={{ height: 110}} />
-
-        </ScrollView>
-      </View>
+      </SafeAreaView>
     </View>
   );
 }
@@ -170,9 +189,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#EEEEEE'
-  },
-  header: {
-    height:50,
   },
   content: {
     flex:1,
@@ -221,7 +237,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   searchBar:{
-    width: 206,
+    width: 197,
     height: 40,
     marginLeft: 15,
   },
