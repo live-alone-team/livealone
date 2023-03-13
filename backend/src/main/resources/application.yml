@@ -16,6 +16,5 @@ spring:
   profiles:
     include: oauth
 
-  web:
-    resources:
-      static-locations: file:src/main/resources/static/profile/
+  mvc:
+    static-path-pattern: /webapp/**
