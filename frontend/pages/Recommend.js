@@ -1,9 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, SafeAreaView} from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, SafeAreaView, Button} from 'react-native';
 import Swiper from 'react-native-swiper';
 import {IP} from '@env';
 import RNPickerSelect from 'react-native-picker-select';
+import { useNavigation } from '@react-navigation/native';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
 
 const Recommend = () => {
   const [search, setSearch] = useState(false);
@@ -14,6 +16,11 @@ const Recommend = () => {
     tv: { title: [], image: [], num: [] },
     youtube: {title: [], image: [], num: []}
   });
+  
+  const navigation = useNavigation();
+  const pageMove = () => {
+    navigation.navigate('Profile');
+  };
 
   const handlePress = async (url, dataKey) => {
     try {
@@ -21,7 +28,7 @@ const Recommend = () => {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsaXZlQWxvbmVAZ21haWwuY29tIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE2Nzg1OTY4MTMsImV4cCI6MTY3ODY4MzIxM30.izF1Kicz7Id0BwMgF0pM-IwPKGxqRPc6qN8Ip0HM6fs"
+          "X-AUTH-TOKEN": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsaXZlQWxvbmVAZ21haWwuY29tIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE2Nzg2ODc0NDksImV4cCI6MTY3ODc3Mzg0OX0.rvPB7VZ8Q9xNZvW9J5m5LG5l4JOjWi3Omp1azzHeBF8"
         },
       })
       const data = await response.json();
@@ -102,17 +109,14 @@ const Recommend = () => {
           
           {/* 타이틀 , 검색 */}
           <View>
-            <View style={styles.topTitle}>
-              
+            <View style={styles.topTitle}>              
               {search ? (
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <TouchableOpacity onPress={() => setSearch(!search)}>
-                      <Image source={require('./../assets/images/arrow-right.png')}/>
+                      <AntDesign name="arrowleft" size={22} color="black" />
                     </TouchableOpacity>
                     <View style={styles.searchBox}>
-
                       <TouchableOpacity onPress={() => setVisible(!visible)}>
-                        {/* <Image style={styles.searchGubun} source={require('./../assets/images/arrow-down.png')}/> */}
                         <View style={{marginLeft: 15, marginRight: 15, width: 34}}>
                           <RNPickerSelect
                             disabled={false}
@@ -130,18 +134,17 @@ const Recommend = () => {
                           />
                         </View>
                       </TouchableOpacity>
-
                       <View style={{ borderWidth: 0.5, height: 28, borderColor: '#D0D5DA' }} />
                       <TextInput style={styles.searchBar} placeholder="검색어를 입력하세요"/>
                     </View>
-                  </View>
+                  </View> 
                 ) : (
                   <Text style={{fontWeight: 'bold', fontSize: 18}}>나혼자산다</Text>
                 )}
 
               <TouchableOpacity onPress={() => setSearch(!search)}>
               {/* onPress={() => navigation.navigate('Profile', {data: 'Hello World!'})} */}
-                <Image source={require('./../assets/images/search-icon.png')} />
+                <AntDesign name="search1" size={22}  />
               </TouchableOpacity>
             </View>
           </View>
@@ -175,6 +178,8 @@ const Recommend = () => {
             {/* youtube */}
             {renderMedia("YoutTube", state.youtube, "youtube")}
 
+            <Button title="Go to Profile" onPress={pageMove} />
+
             <View style={{ height: 110}} />
 
           </ScrollView>
@@ -183,6 +188,7 @@ const Recommend = () => {
     </View>
   );
 }
+
 
 // css
 const styles = StyleSheet.create({

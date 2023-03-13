@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Image } from 'react-native';
+import { Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
 import Vote from './pages/Vote';
 import MainPage from './pages/MainPage';
 import Recommend from './pages/Recommend';
@@ -14,26 +15,26 @@ const TabNavigator = () => {
     <Tab.Navigator>
       <Tab.Screen
         name="MainPage"
-        component={MainPage}
+        component={MainPage}        
         options={{
-          tabBarLabel: '메인 화면',
-          tabBarIcon: ({ color, size }) => (
-            <View>
-              <Image source={require('./assets/images/home-icon.png')} />
-            </View>
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ fontSize:10, color: focused ? '#FF4545' : 'gray'  }}>메인 화면</Text>
           ),
-          headerShown: false
+          tabBarIcon: ({ color, size, focused }) => (
+            <AntDesign name="home" size={24} color={focused ? '#FF4545' : 'gray'} />
+          ),
+          headerShown: false,
         }}
       />
       <Tab.Screen
         name="Vote"
         component={Vote}
         options={{
-          tabBarLabel: '투표 추가',
-          tabBarIcon: ({ color, size }) => (
-            <View>
-              <Image source={require('./assets/images/vote-icon.png')} />
-            </View>
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ fontSize:10, color: focused ? '#FF4545' : 'gray'  }}>투표 추가</Text>
+          ),
+          tabBarIcon: ({ color, size, focused }) => (
+            <AntDesign name="pluscircleo" size={24} color={focused ? '#FF4545' : 'gray'} />
           ),
           headerShown: false
         }}
@@ -42,11 +43,11 @@ const TabNavigator = () => {
         name="Recommend"
         component={Recommend}
         options={{
-          tabBarLabel: '투표',
-          tabBarIcon: ({ color, size }) => (
-            <View>
-              <Image source={require('./assets/images/recommend-icon.png')} />
-            </View>
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ fontSize:10, color: focused ? '#FF4545' : 'gray'  }}>투표</Text>
+          ),
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons name="chatbubbles-outline" size={24} color={focused ? '#FF4545' : 'gray'} />
           ),
           headerShown: false
         }}
@@ -55,11 +56,11 @@ const TabNavigator = () => {
         name="Profile"
         component={Profile}
         options={{
-          tabBarLabel: '프로필',
-          tabBarIcon: ({ color, size }) => (
-            <View>
-              <Image source={require('./assets/images/profile-icon.png')} />
-            </View>
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ fontSize:10, color: focused ? '#FF4545' : 'gray'  }}>프로필</Text>
+          ),
+          tabBarIcon: ({ color, size, focused }) => (
+            <AntDesign name="user" size={24} color={focused ? '#FF4545' : 'gray'} />
           ),
           headerShown: false
         }}
@@ -71,7 +72,7 @@ const TabNavigator = () => {
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <TabNavigator />
+      <TabNavigator/>
     </NavigationContainer>
   );
 };
