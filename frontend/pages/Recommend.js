@@ -18,8 +18,8 @@ const Recommend = () => {
   });
   
   const navigation = useNavigation();
-  const pageMove = () => {
-    navigation.navigate('Profile');
+  const datailMove = () => {
+    navigation.navigate('RecommendDetail');
   };
 
   const handlePress = async (url, dataKey) => {
@@ -84,8 +84,10 @@ const Recommend = () => {
               {[startIndex, startIndex + 1, startIndex + 2].map((index) => (
                 <React.Fragment key={index}>
                   <View style={styles.slideContainer}>
-                    <Image style={styles.slide} source={{ uri: data.image[index] }} />
-                    <Text style={styles.contentTitle}>{data.title[index]}</Text>
+                    <TouchableOpacity onPress={() => datailMove()}>
+                      <Image style={styles.slide} source={{ uri: data.image[index] }}/>
+                      <Text style={styles.contentTitle}>{data.title[index]}</Text>
+                    </TouchableOpacity>
                     {index % 3 !== 2 && (
                       <View style={{ width: "5%" }} />
                     )}
@@ -177,8 +179,6 @@ const Recommend = () => {
 
             {/* youtube */}
             {renderMedia("YoutTube", state.youtube, "youtube")}
-
-            <Button title="Go to Profile" onPress={pageMove} />
 
             <View style={{ height: 110}} />
 

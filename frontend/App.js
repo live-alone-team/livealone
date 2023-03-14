@@ -1,14 +1,39 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text ,TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import Vote from './pages/Vote';
 import MainPage from './pages/MainPage';
 import Recommend from './pages/Recommend';
 import Profile from './pages/Profile';
+import RecommendDetail from './pages/RecommendDetail';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+const RecommendStack = ({navigation}) => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Recommend"
+        component={Recommend}
+        options={{ 
+          headerShown: false,
+          title: ' ',
+        }}
+      />
+      <Stack.Screen
+        name="RecommendDetail"
+        component={RecommendDetail}
+        options={{ 
+          title: '리뷰 보기',
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
 
 const TabNavigator = () => {
   return (
@@ -41,7 +66,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="Recommend"
-        component={Recommend}
+        component={RecommendStack}
         options={{
           tabBarLabel: ({ focused, color }) => (
             <Text style={{ fontSize:10, color: focused ? '#FF4545' : 'gray'  }}>투표</Text>
