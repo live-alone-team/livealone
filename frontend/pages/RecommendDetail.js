@@ -9,7 +9,7 @@ const App = () => {
           <View style={styles.itemImg}></View>
           <View style={styles.itemInfo}>
 
-          </View>
+          </View> 
         </View>
       </SafeAreaView>
     </View>
