@@ -4,7 +4,6 @@ import live.alone.soleplay.config.jwt.UserDetailsImpl;
 import live.alone.soleplay.dto.CommentRequest;
 import live.alone.soleplay.dto.CommentResponse;
 import live.alone.soleplay.dto.CommentUpdate;
-import live.alone.soleplay.entity.Comment;
 import live.alone.soleplay.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +34,7 @@ public class CommentController {
     }
 
     @PatchMapping("/comment/{commentId}")
-    public ResponseEntity<Comment> updateComment(@RequestBody CommentUpdate commentUpdate,
+    public ResponseEntity<CommentResponse> updateComment(@RequestBody CommentUpdate commentUpdate,
                                                  @PathVariable Long commentId,
                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Long memberId = userDetails.getMember().getId();

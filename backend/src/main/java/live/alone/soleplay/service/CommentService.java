@@ -46,7 +46,7 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
-    public Comment updateComment(CommentUpdate commentUpdate, Long commentId, Long memberId) {
+    public CommentResponse updateComment(CommentUpdate commentUpdate, Long commentId, Long memberId) {
         Optional<Comment> comment = commentRepository.findBy(commentId, memberId);
 
         if (comment.isEmpty())
@@ -58,7 +58,7 @@ public class CommentService {
             updated.setContent(commentUpdate.getContent());
 
         commentRepository.save(updated);
-        return updated;
+        return new CommentResponse(updated);
     }
 
     @Transactional

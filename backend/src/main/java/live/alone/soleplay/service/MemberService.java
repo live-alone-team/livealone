@@ -72,7 +72,7 @@ public class MemberService {
                 .collect(Collectors.toList());
     }
 
-    public Member updateProfile(MemberUpdateRequest memberUpdateRequest, Long memberId) {
+    public String updateProfile(MemberUpdateRequest memberUpdateRequest, Long memberId) {
         Optional<Member> member = memberRepository.findById(memberId);
 
         if (member.isEmpty())
@@ -88,18 +88,20 @@ public class MemberService {
         }
 
         memberRepository.save(updatedMember);
-
-        return updatedMember;
+        return "Editing complete.";
     }
 
-    public Member uploadProfile(String savePath, Long memberId) {
+    public UploadFileResponse uploadProfile(String savePath, Long memberId) {
         Optional<Member> member = memberRepository.findById(memberId);
+
+        if (member.isEmpty())
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
 
         Member updatedMember = member.get();
         updatedMember.setImage(savePath);
         memberRepository.save(updatedMember);
 
-        return updatedMember;
+        return new UploadFileResponse(updatedMember);
     }
 
     public void withdrawal(Long memberId) {
