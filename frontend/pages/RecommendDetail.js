@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, SafeAreaView, Image, TextInput, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, Image, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import {IP} from '@env';
-import { SimpleLineIcons } from '@expo/vector-icons';
+import { SimpleLineIcons, Entypo } from '@expo/vector-icons';
 
 const RecommendDetail = () => {
   const { params } = useRoute();
@@ -15,6 +15,7 @@ const RecommendDetail = () => {
   });
 
   const [comments, setComments] = useState();
+  const [content, setContent] = useState();
 
   const findItem = async (url) => {
     try {
@@ -69,9 +70,69 @@ const RecommendDetail = () => {
     }
   };  
 
+  const writeComment = async () => {
+    try {
+      const response = await fetch(`http://${IP}:8080/user/chart/${dataKey}/${item.title}/comment`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-TOKEN": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsaXZlQWxvbmVAZ21haWwuY29tIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE2NzkwNTcxMTksImV4cCI6MTY3OTE0MzUxOX0.QUW4BpZMEsEPNXS4hpfX_AcxTBbkh2RBQb7o4wWlosQ"
+        },
+        body: JSON.stringify({ content : content })
+      })
+      // 댓글 작성 후, 댓글 리스트를 다시 불러옴
+      findComment(`http://${IP}:8080/user/chart/${dataKey}/${item.title}/comments`);
+      setContent(''); // 댓글 작성 창 초기화
+    } catch (error) {
+      console.error(error);
+    }
+  };  
+
+
+
   useEffect(() => {
     findItem(`http://${IP}:8080/user/${dataKey}/${id}`);
   }, []);
+
+  const commentBox = (comments) => {
+    return (
+        <View>
+          <View style={{ width: '100%', flexDirection: 'row' }}>
+            <View style={{ width: '80%', height: '100%', flexDirection: 'row', marginLeft: 25, marginTop: 25, marginBottom: 25 }}>
+
+              {/* 프로필 사진 */}
+              <View style={{width: '20%'}}>
+
+              </View> 
+
+              <View style={{width: '80%'}}>
+                <View style={{width: '100%', height: 40, flexDirection: 'row', alignItems: 'center'}}>
+
+                  {/* 작성자 */}
+                  <Text style={{fontSize: '16', fontWeight: '500'}}>
+                    {comments.nickname}{' '}
+                  </Text>
+
+                  {/* 날짜 */}
+                  <Text style={{color:'#6B7583', fontSize: '13'}}>
+                    {comments.createdDate.substring(0,10)}
+                  </Text>
+                </View>
+
+                {/* 내용 */}
+                <Text style={{width: '100%', height: 60}}>
+                  {comments.content}
+                </Text>
+              </View>
+            </View>
+            <Entypo name="dots-three-horizontal" size={20} color="black" style={{marginTop: 20, marginLeft: 5}}/>
+          </View>
+          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <View style={{borderBottomWidth: 1, borderBottomColor: '#E0E0E0', borderBottomStyle: 'solid', width: '90%'}}/>
+          </View>
+        </View>
+    )
+  }
 
   return (
     <View style={styles.container}>
@@ -105,21 +166,29 @@ const RecommendDetail = () => {
         </View>
 
         {/* 댓글 입력란 */}
-          <View style={{width: '100%', height: 50, justifyContent: 'center', alignItems: 'center'}}>
-            <View style={{ flexWrap: 'wrap', fontSize: 14, width: '90%', height: '85%', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', borderWidth: 1, borderColor: '#D6D6D6', borderRadius: '5'}}>
-              <View style={{ width:'85%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                <TextInput style={{ width:'100%', height: '90%'}} placeholder = '댓글을 입력해주세요' />
-              </View>
-              <SimpleLineIcons name="pencil" size={20} color="#6B7583" style={{ marginLeft: 10 }}/>
+        <View style={{width: '100%', height: 50, justifyContent: 'center', alignItems: 'center'}}>
+          <View style={{ flexWrap: 'wrap', fontSize: 14, width: '90%', height: '85%', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', borderWidth: 1, borderColor: '#D6D6D6', borderRadius: '5'}}>
+            <View style={{ width:'85%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+              <TextInput value={content} onChangeText={setContent} style={{ width:'100%', height: '90%'}} placeholder = '댓글을 입력해주세요' />
             </View>
+            <TouchableOpacity onPress={() => writeComment()}>
+              <SimpleLineIcons name="pencil" size={20} color="#6B7583" style={{ marginLeft: 10 }}/>
+            </TouchableOpacity>
           </View>
+        </View>
 
-          <View style={{ marginTop: 20, height: 16, height: 5, backgroundColor:'#EEEEEE' }} />
+        <View style={{ marginTop: 20, height: 16, height: 5, backgroundColor:'#EEEEEE' }} />
 
-          {/* 댓글 */}
-          <ScrollView>
-
-          </ScrollView>
+        {/* 댓글 */}
+        <ScrollView>
+          {comments && comments.map((comment, index) => {
+            return (
+              <View key={index}>
+                {commentBox(comment)}
+              </View>
+            )
+          })}
+        </ScrollView>
 
       </SafeAreaView>
     </View>
@@ -130,7 +199,7 @@ const RecommendDetail = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF'
+    backgroundColor: '#FFFFFF',
   },
   itemBox: {
     width: '100%',
