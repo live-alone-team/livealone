@@ -12,14 +12,17 @@ const Recommend = () => {
   const [visible, setVisible] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
   const [state, setState] = useState({ 
-    movie: { title: [], image: [], num: [] },
-    tv: { title: [], image: [], num: [] },
-    youtube: {title: [], image: [], num: []}
+    movies: { title: [], image: [], id: []},
+    tv: { title: [], image: [], id: []},
+    youtube: {title: [], image: [] }
   });
   
   const navigation = useNavigation();
-  const datailMove = () => {
-    navigation.navigate('RecommendDetail');
+  const datailMove = (dataKey, id) => {
+    navigation.navigate('RecommendDetail',{
+      dataKey : dataKey,
+      id : id
+    });
   };
 
   const handlePress = async (url, dataKey) => {
@@ -28,30 +31,31 @@ const Recommend = () => {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsaXZlQWxvbmVAZ21haWwuY29tIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE2Nzg2ODc0NDksImV4cCI6MTY3ODc3Mzg0OX0.rvPB7VZ8Q9xNZvW9J5m5LG5l4JOjWi3Omp1azzHeBF8"
+          "X-AUTH-TOKEN": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsaXZlQWxvbmVAZ21haWwuY29tIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE2NzkwNTcxMTksImV4cCI6MTY3OTE0MzUxOX0.QUW4BpZMEsEPNXS4hpfX_AcxTBbkh2RBQb7o4wWlosQ"
         },
       })
       const data = await response.json();
-      let [title, image, num] = [[],[],[]];
+      let [title, image, id] = [[],[],[]];
 
       // youtube만 구조가 조금 다름
       let results = dataKey === 'youtube' ? data.items : data.results;
       results.map((item,i) => {
-        if(dataKey === 'movie'){
+        if(dataKey === 'movies'){
           title.push(item["title"])
           image.push(`https://image.tmdb.org/t/p/w500${item.poster_path}`);
+          id.push(item["id"]);
         }else if(dataKey === 'tv'){
           title.push(item["name"])
           image.push(`https://image.tmdb.org/t/p/w500${item.poster_path}`);
+          id.push(item["id"]);
         }else{
           title.push(item.snippet.title)
           image.push(`${item.snippet.thumbnails.standard.url}`);
         }
-        num.push(i);
       });
       setState(prevState => ({ 
         ...prevState,
-        [dataKey]: {title, image, num}
+        [dataKey]: {title, image, id}
       }));
     } catch (error) {
       console.error(error);
@@ -59,7 +63,7 @@ const Recommend = () => {
   };
 
   useEffect(() => {
-    handlePress(`http://${IP}:8080/user/chart/movies`, 'movie');
+    handlePress(`http://${IP}:8080/user/chart/movies`, 'movies');
     handlePress(`http://${IP}:8080/user/chart/tv`, 'tv');
     handlePress(`http://${IP}:8080/user/chart/youtube`, 'youtube');
   }, []);
@@ -84,8 +88,8 @@ const Recommend = () => {
               {[startIndex, startIndex + 1, startIndex + 2].map((index) => (
                 <React.Fragment key={index}>
                   <View style={styles.slideContainer}>
-                    <TouchableOpacity onPress={() => datailMove()}>
-                      <Image style={styles.slide} source={{ uri: data.image[index] }}/>
+                    <TouchableOpacity onPress={dataKey != 'youtube' ? () => datailMove(dataKey, data.id[index]) : null}>
+                      <Image style={styles.slide} source={{ url: data.image[index] }}/>
                       <Text style={styles.contentTitle}>{data.title[index]}</Text>
                     </TouchableOpacity>
                     {index % 3 !== 2 && (
@@ -145,7 +149,6 @@ const Recommend = () => {
                 )}
 
               <TouchableOpacity onPress={() => setSearch(!search)}>
-              {/* onPress={() => navigation.navigate('Profile', {data: 'Hello World!'})} */}
                 <AntDesign name="search1" size={22}  />
               </TouchableOpacity>
             </View>
@@ -167,8 +170,8 @@ const Recommend = () => {
               </Swiper>
             </View>
 
-            {/* movie */}
-            {renderMedia("주간 인기 영화", state.movie, "movie")}
+            {/* movies */}
+            {renderMedia("주간 인기 영화", state.movies, "movies")}
         
             <View style={{ height: 16, backgroundColor:'#EEEEEE' }} />
 
@@ -194,7 +197,7 @@ const Recommend = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EEEEEE'
+    backgroundColor: '#FFFFFF'
   },
   content: {
     flex:1,
