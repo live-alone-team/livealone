@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, SafeAreaView, Image, TextInput, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, Image, TextInput, ScrollView, TouchableOpacity, ActionSheetIOS } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import {IP} from '@env';
+import { IP, TOKEN } from '@env';
 import { SimpleLineIcons, Entypo } from '@expo/vector-icons';
 
 const RecommendDetail = () => {
@@ -11,11 +11,14 @@ const RecommendDetail = () => {
     title : "",
     image : "",
     overview : "",
-    date : ""
+    date : "",
+    name: ""
   });
-
   const [comments, setComments] = useState();
   const [content, setContent] = useState();
+  const [isEditing, setIsEditing] = useState(false);
+  const [line, setLine] = useState(9);
+  const [isActivated, setIsActivated] = useState(false);
 
   const findItem = async (url) => {
     try {
@@ -23,7 +26,7 @@ const RecommendDetail = () => {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsaXZlQWxvbmVAZ21haWwuY29tIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE2NzkwNTcxMTksImV4cCI6MTY3OTE0MzUxOX0.QUW4BpZMEsEPNXS4hpfX_AcxTBbkh2RBQb7o4wWlosQ"
+          "X-AUTH-TOKEN": TOKEN
         },
       })
       const data = await response.json();
@@ -31,7 +34,8 @@ const RecommendDetail = () => {
         title : "",
         image : "",
         overview : "",
-        date : ""
+        date : "",
+        name : "",
       }
       if(dataKey == 'movies'){
         getItem.title = data.title;
@@ -43,6 +47,8 @@ const RecommendDetail = () => {
         getItem.image = `https://image.tmdb.org/t/p/w500${data.poster_path}`;
         getItem.overview = data.overview;
         getItem.date = data.first_air_date;
+        data.created_by.map((value) => {getItem.name += value.name + ', '})
+        getItem.name = getItem.name.slice(0, -2)
       }
       setItem(prevState => ({ 
         ...prevState,
@@ -60,7 +66,7 @@ const RecommendDetail = () => {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsaXZlQWxvbmVAZ21haWwuY29tIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE2NzkwNTcxMTksImV4cCI6MTY3OTE0MzUxOX0.QUW4BpZMEsEPNXS4hpfX_AcxTBbkh2RBQb7o4wWlosQ"
+          "X-AUTH-TOKEN": TOKEN
         },
       })
       const data = await response.json();
@@ -76,7 +82,7 @@ const RecommendDetail = () => {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsaXZlQWxvbmVAZ21haWwuY29tIiwicm9sZXMiOiJST0xFX1VTRVIiLCJpYXQiOjE2NzkwNTcxMTksImV4cCI6MTY3OTE0MzUxOX0.QUW4BpZMEsEPNXS4hpfX_AcxTBbkh2RBQb7o4wWlosQ"
+          "X-AUTH-TOKEN": TOKEN
         },
         body: JSON.stringify({ content : content })
       })
@@ -86,13 +92,48 @@ const RecommendDetail = () => {
     } catch (error) {
       console.error(error);
     }
+  };    
+
+  const deleteComment = async (commentId) => {
+    try {
+      const response = await fetch(`http://${IP}:8080/user/comment/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-TOKEN": TOKEN
+        },
+        body: JSON.stringify({ commentId : commentId })
+      })
+      findComment(`http://${IP}:8080/user/chart/${dataKey}/${item.title}/comments`);
+    } catch (error) {
+      console.error(error);
+    }
   };  
 
-
+  const updateComment = async (commentId, content) => {
+    try {
+      const response = await fetch(`http://${IP}:8080/user/comment/${commentId}`, {
+        method: 'PATCH',
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-TOKEN": TOKEN
+        },
+        body: JSON.stringify({ commentId : commentId, content: 'test' })
+      })
+      findComment(`http://${IP}:8080/user/chart/${dataKey}/${item.title}/comments`);
+    } catch (error) {
+      console.error(error);
+    }
+  };  
 
   useEffect(() => {
     findItem(`http://${IP}:8080/user/${dataKey}/${id}`);
   }, []);
+  
+  const handleLine = () => {
+    isActivated ? setLine(9) : setLine(Number.MAX_SAFE_INTEGER);
+    setIsActivated(prev => !prev);
+  }
 
   const commentBox = (comments) => {
     return (
@@ -120,12 +161,21 @@ const RecommendDetail = () => {
                 </View>
 
                 {/* 내용 */}
-                <Text style={{width: '100%', height: 60}}>
-                  {comments.content}
-                </Text>
+                {isEditing ? (
+                    <TextInput multiline={true} style={{width: '100%', height: 60}}>
+                      {comments.content}
+                    </TextInput>
+                  ):(
+                    <Text style={{width: '100%', height: 60}}>
+                      {comments.content}
+                    </Text>
+                  )
+                }
               </View>
             </View>
-            <Entypo name="dots-three-horizontal" size={20} color="black" style={{marginTop: 20, marginLeft: 5}}/>
+            <TouchableOpacity onPress={() => commentDetail(comments.commentId)}>
+              <Entypo name="dots-three-horizontal" size={20} color="black" style={{marginTop: 20, marginLeft: 5}}/>
+            </TouchableOpacity>
           </View>
           <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
             <View style={{borderBottomWidth: 1, borderBottomColor: '#E0E0E0', borderBottomStyle: 'solid', width: '90%'}}/>
@@ -134,32 +184,63 @@ const RecommendDetail = () => {
     )
   }
 
+  const commentDetail = (commentId) =>
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ['취소', '수정', '삭제'],
+        destructiveButtonIndex: 2,
+        cancelButtonIndex: 0,
+        userInterfaceStyle: 'dark',
+      },
+      buttonIndex => {
+        // 취소 버튼
+        if (buttonIndex === 0) {
+          
+        // 수정 버튼
+        } else if (buttonIndex === 1) {
+          setIsEditing(true)
+          // updateComment(commentId);
+
+        // 삭제 버튼
+        } else if (buttonIndex === 2) {
+          deleteComment(commentId);
+        }
+      },
+    );  
+
   return (
     <View style={styles.container}>
-      <SafeAreaView>
+      <SafeAreaView style={{ flex: 1 }}>
 
-        {/* 이미지, 제목, 감독, 개봉일, 설명 */}
+        {/* 영화 정보*/}
         <View style={styles.itemBox}>
+
+          {/* 이미지 */}
           <Image style={styles.itemImg} source={{ url: item.image }}/>
           <View style={styles.itemInfo}>
+
+            {/* 제목 */}
             {item.title &&
               <View style={{width: '100%', height: 25, justifyContent: 'center'}}>
                 <Text style={{ fontWeight: 'bold', flexWrap: 'wrap', fontSize: 20}}>{item.title}</Text>  
               </View>  
             }
-            {item.title &&
+            {/* 감독 */}
+            {item.name &&
               <View style={{width: '100%', height: 25, justifyContent: 'center'}}>
-                <Text style={{ fontWeight: '500', flexWrap: 'wrap', fontSize: 15}}>감독 : {item.title}</Text>  
+                <Text style={{ fontWeight: '500', flexWrap: 'wrap', fontSize: 14}}>감독 : {item.name}</Text>  
               </View>  
             }
+            {/* 개봉일 */}
             {item.date &&
               <View style={{width: '100%', height: 25, justifyContent: 'center'}}>
-                <Text style={{ fontWeight: '500', flexWrap: 'wrap', fontSize: 15}}>개봉일 : {item.date}</Text>  
+                <Text style={{ fontWeight: '500', flexWrap: 'wrap', fontSize: 14}}>개봉일 : {item.date}</Text>  
               </View>  
             }
+            {/* 설명 */}
             {item.overview &&
               <View style={{width: '100%', height: '65%'}}>
-                <Text style={{ flexWrap: 'wrap', fontSize: 13}}>{item.overview}</Text>  
+                <Text numberOfLines={line} ellipsizeMode="tail" onPress={()=>handleLine()} style={{ flexWrap: 'wrap', fontSize: 13}}>{item.overview}</Text>  
               </View>  
             }
           </View> 
@@ -171,7 +252,7 @@ const RecommendDetail = () => {
             <View style={{ width:'85%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
               <TextInput value={content} onChangeText={setContent} style={{ width:'100%', height: '90%'}} placeholder = '댓글을 입력해주세요' />
             </View>
-            <TouchableOpacity onPress={() => writeComment()}>
+            <TouchableOpacity onPress={() => {if(content){writeComment()}}}>
               <SimpleLineIcons name="pencil" size={20} color="#6B7583" style={{ marginLeft: 10 }}/>
             </TouchableOpacity>
           </View>
@@ -180,7 +261,7 @@ const RecommendDetail = () => {
         <View style={{ marginTop: 20, height: 16, height: 5, backgroundColor:'#EEEEEE' }} />
 
         {/* 댓글 */}
-        <ScrollView>
+        <ScrollView style={{ height: '100%' }}>
           {comments && comments.map((comment, index) => {
             return (
               <View key={index}>
