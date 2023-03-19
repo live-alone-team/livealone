@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, SafeAreaView, Image, TextInput, ScrollView, TouchableOpacity, ActionSheetIOS } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, Image, TextInput, ScrollView, TouchableOpacity, ActionSheetIOS, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { IP, TOKEN } from '@env';
 import { SimpleLineIcons, Entypo } from '@expo/vector-icons';
@@ -16,9 +16,18 @@ const RecommendDetail = () => {
   });
   const [comments, setComments] = useState();
   const [content, setContent] = useState();
-  const [isEditing, setIsEditing] = useState(false);
+  const [edit, setEdit] = useState({
+    isEditing : false,
+    id : ''
+  })
+
   const [line, setLine] = useState(9);
   const [isActivated, setIsActivated] = useState(false);
+
+  const authErr = () =>
+  Alert.alert('접근 권한이 없는 유저입니다.', '', [
+    {text: '돌아가기'},
+  ]);
 
   const findItem = async (url) => {
     try {
@@ -104,7 +113,12 @@ const RecommendDetail = () => {
         },
         body: JSON.stringify({ commentId : commentId })
       })
-      findComment(`http://${IP}:8080/user/chart/${dataKey}/${item.title}/comments`);
+      if (response.status === 200) {
+        findComment(`http://${IP}:8080/user/chart/${dataKey}/${item.title}/comments`);
+      }else if(response.status === 401){
+        authErr()
+      }
+
     } catch (error) {
       console.error(error);
     }
@@ -118,9 +132,16 @@ const RecommendDetail = () => {
           "Content-Type": "application/json",
           "X-AUTH-TOKEN": TOKEN
         },
-        body: JSON.stringify({ commentId : commentId, content: 'test' })
+        body: JSON.stringify({ commentId : commentId, content: content })
       })
-      findComment(`http://${IP}:8080/user/chart/${dataKey}/${item.title}/comments`);
+
+      if (response.status === 200) {
+        findComment(`http://${IP}:8080/user/chart/${dataKey}/${item.title}/comments`);
+        setEdit({isEditing: false, id: ''}); // 수정 상태 초기화
+        setContent(''); // 댓글 작성 창 초기화
+      }else if(response.status === 401){
+        authErr()
+      }
     } catch (error) {
       console.error(error);
     }
@@ -161,19 +182,12 @@ const RecommendDetail = () => {
                 </View>
 
                 {/* 내용 */}
-                {isEditing ? (
-                    <TextInput multiline={true} style={{width: '100%', height: 60}}>
-                      {comments.content}
-                    </TextInput>
-                  ):(
-                    <Text style={{width: '100%', height: 60}}>
-                      {comments.content}
-                    </Text>
-                  )
-                }
+                <Text style={{width: '100%', height: 60}}>
+                  {comments.content}
+                </Text>
               </View>
             </View>
-            <TouchableOpacity onPress={() => commentDetail(comments.commentId)}>
+            <TouchableOpacity onPress={() => commentDetail(comments.commentId, comments.content)}>
               <Entypo name="dots-three-horizontal" size={20} color="black" style={{marginTop: 20, marginLeft: 5}}/>
             </TouchableOpacity>
           </View>
@@ -184,7 +198,7 @@ const RecommendDetail = () => {
     )
   }
 
-  const commentDetail = (commentId) =>
+  const commentDetail = (commentId, content) =>
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: ['취소', '수정', '삭제'],
@@ -198,9 +212,11 @@ const RecommendDetail = () => {
           
         // 수정 버튼
         } else if (buttonIndex === 1) {
-          setIsEditing(true)
-          // updateComment(commentId);
-
+          setEdit({
+            isEditing : true,
+            id : commentId
+          })
+          setContent(content)
         // 삭제 버튼
         } else if (buttonIndex === 2) {
           deleteComment(commentId);
@@ -252,7 +268,13 @@ const RecommendDetail = () => {
             <View style={{ width:'85%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
               <TextInput value={content} onChangeText={setContent} style={{ width:'100%', height: '90%'}} placeholder = '댓글을 입력해주세요' />
             </View>
-            <TouchableOpacity onPress={() => {if(content){writeComment()}}}>
+            <TouchableOpacity onPress={() => {
+                if(!content){ null; }
+                // 수정
+                else if(edit.isEditing){ updateComment(edit.id, content);
+                // 등록
+                }else if(!edit.isEditing){ writeComment();}
+              }}>
               <SimpleLineIcons name="pencil" size={20} color="#6B7583" style={{ marginLeft: 10 }}/>
             </TouchableOpacity>
           </View>
