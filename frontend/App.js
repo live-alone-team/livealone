@@ -9,6 +9,7 @@ import MainPage from './pages/MainPage';
 import Recommend from './pages/Recommend';
 import Profile from './pages/Profile';
 import RecommendDetail from './pages/RecommendDetail';
+import RecommendSearch from './pages/RecommendSearch';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -29,6 +30,13 @@ const RecommendStack = ({navigation}) => {
         component={RecommendDetail}
         options={{ 
           title: '리뷰 보기',
+        }}
+      />
+      <Stack.Screen
+        name="RecommendSearch"
+        component={RecommendSearch}
+        options={{ 
+          title: '리뷰 검색',
         }}
       />
     </Stack.Navigator>
