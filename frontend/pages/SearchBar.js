@@ -10,7 +10,8 @@ const SearchBar = ({ search, setSearch, selectedValue, setSelectedValue, searchV
       <View style={styles.topTitle}>
         {search ? (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity onPress={() => {setSearch(!search)}}>
+            <TouchableOpacity onPress={() => {setSearch(!search)}
+            }>
               <AntDesign name="arrowleft" size={22} color="black" />
             </TouchableOpacity>
             <View style={styles.searchBox}>

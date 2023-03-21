@@ -36,7 +36,8 @@ const RecommendStack = ({navigation}) => {
         name="RecommendSearch"
         component={RecommendSearch}
         options={{ 
-          title: '리뷰 검색',
+          headerShown: false,
+          title: ' ',
         }}
       />
     </Stack.Navigator>

@@ -20,7 +20,7 @@ const Recommend = () => {
   const searchMove = (dataKey, title) => {
     navigation.navigate('RecommendSearch',{
       dataKey : dataKey,
-      title : title
+      title : title,
     });
   };
 
@@ -121,7 +121,7 @@ const Recommend = () => {
             <View style={{ height: 16, backgroundColor:'#EEEEEE' }} />
 
             {/* youtube */}
-            <Media title="YouTube" data={state.tv} dataKey="youtube"/>
+            <Media title="YouTube" data={state.youtube} dataKey="youtube"/>
 
             <View style={{ height: 110}} />
 
