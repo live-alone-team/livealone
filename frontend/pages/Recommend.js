@@ -2,27 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, SafeAreaView, Button} from 'react-native';
 import Swiper from 'react-native-swiper';
 import { IP , TOKEN } from '@env';
-import { useNavigation } from '@react-navigation/native';
 import SearchBar from './SearchBar';
 import Media from './Media';
 
 const Recommend = () => {
-  const [search, setSearch] = useState(false);
-  const [selectedValue, setSelectedValue] = useState(null);
-  const [searchValue, setSearchValue] = useState(null);
   const [state, setState] = useState({ 
     movies: { title: [], image: [], id: []},
     tv: { title: [], image: [], id: []},
     youtube: {title: [], image: [] }
-  });
-  
-  const navigation = useNavigation();
-  const searchMove = (dataKey, title) => {
-    navigation.navigate('RecommendSearch',{
-      dataKey : dataKey,
-      title : title,
-    });
-  };
+  });  
 
   const handlePress = async (url, dataKey) => {
     try {
@@ -67,33 +55,14 @@ const Recommend = () => {
     handlePress(`http://${IP}:8080/user/chart/youtube`, 'youtube');
   }, []);
 
-  const searchFunc = () => {
-    if(!selectedValue){
-      console.log(selectedValue + '-1')
-    }else if(!searchValue){
-      console.log(searchValue + '-2')
-    }else{
-      searchMove(selectedValue, searchValue)
-    }
-  }
-
   return (
-    
     <View style={styles.container}>
       {/* iOS 11 이상이 설치된 아이폰에만 적용됨. */}
       <SafeAreaView>
         <View style={{backgroundColor:'#FFFFFF'}}>
           
           {/* 타이틀 , 검색 */}
-          <SearchBar
-            search={search}
-            setSearch={setSearch}
-            selectedValue={selectedValue}
-            setSelectedValue={setSelectedValue}
-            searchValue={searchValue}
-            setSearchValue={setSearchValue}
-            searchFunc={searchFunc}
-          />
+          <SearchBar/>
           <ScrollView>
             {/* 배너 */}
             <View style={styles.banner}>

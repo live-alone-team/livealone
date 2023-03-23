@@ -1,10 +1,58 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import RNPickerSelect from 'react-native-picker-select';
+import { useNavigation } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
+import { IP, TOKEN } from '@env';
 
-const SearchBar = ({ search, setSearch, selectedValue, setSelectedValue, searchValue, setSearchValue, searchFunc }) => {
+const SearchBar = () => {
+  const [search, setSearch] = useState(false);
+  const [selectedValue, setSelectedValue] = useState(null);
+  const [searchValue, setSearchValue] = useState(null);
+  const [searchInfo, setSearchInfo] = useState('');
+  const { params, name } = useRoute();
+  const navigation = useNavigation();
 
+  const searchResult = async (url) => {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-TOKEN": TOKEN
+        },
+      })
+      const data = await response.json();
+      setSearchInfo(data.results)
+    } catch (error) {
+      console.error(error);
+    }
+  }; 
+
+  useEffect(() => {
+    console.log(search, selectedValue, searchValue)
+    setSearch(search)
+    setSelectedValue(selectedValue)
+    setSearchValue(searchValue)
+  }, [searchInfo]);
+  
+  const searchFunc = () => {
+    if(!selectedValue){
+      console.log(selectedValue + '-1')
+    }else if(!searchValue){
+      console.log(searchValue + '-2')
+    }else{
+      searchResult(`http://${IP}:8080/user/search/${selectedValue}/${searchValue}`);
+    }
+  }
+  
+  const searchMove = () => {
+    navigation.navigate('RecommendSearch',{
+      params
+    });
+  };
+  
   return (
     <View>
       <View style={styles.topTitle}>
