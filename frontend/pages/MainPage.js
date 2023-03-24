@@ -1,67 +1,125 @@
-//우리가 리액트, 리액트 네이티브, 엑스포 라이브러리에서 꺼내 사용할 기능들을
-//이렇게 앞으로도 상단에 선언한다음 가져다 사용합니다.
-import { StatusBar } from "expo-status-bar";
-import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, SafeAreaView, Button} from 'react-native';
+import Swiper from 'react-native-swiper';
+import { IP , TOKEN } from '@env';
+import SearchBar from './SearchBar';
+import Media from './Media';
 
-//App.js는 결국 App 함수를 내보내기 하고 있는 자바스크립트 파일입니다.
-//이 함수는 무언가?를 반환하고 있는데 결국 화면을 반환하고 있습니다.
-export default function MainPage() {
-  const mysetting = () => {
-    Alert.alert("TouchableOpacity에도 onPress 속성이 있습니다");
+const MainPage = () => {
+  const [state, setState] = useState({ 
+    movies: { title: [], image: [], id: []},
+    tv: { title: [], image: [], id: []},
+    youtube: {title: [], image: [] }
+  });  
+
+  const handlePress = async (url, dataKey) => {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-TOKEN": TOKEN
+        },
+      })
+      const data = await response.json();
+      let [title, image, id] = [[],[],[]];
+
+      // youtube만 구조가 조금 다름
+      let results = dataKey === 'youtube' ? data.items : data.results;
+      results.map((item,i) => {
+        if(dataKey === 'movies'){
+          title.push(item["title"])
+          image.push(`https://image.tmdb.org/t/p/w500${item.poster_path}`);
+          id.push(item["id"]);
+        }else if(dataKey === 'tv'){
+          title.push(item["name"])
+          image.push(`https://image.tmdb.org/t/p/w500${item.poster_path}`);
+          id.push(item["id"]);
+        }else{
+          title.push(item.snippet.title)
+          image.push(`${item.snippet.thumbnails.standard.url}`);
+        }
+      });
+      setState(prevState => ({ 
+        ...prevState,
+        [dataKey]: {title, image, id}
+      }));
+    } catch (error) {
+      console.error(error);
+    }
   };
-  //화면을 반환합니다.
-  //HTML 태그 같이 생긴 이 문법은 JSX라 불리우며 실제 화면을 그리는 문법입니다,
-  //이번 강의에서 자세히 다룹니다
+
+  useEffect(() => {
+    handlePress(`http://${IP}:8080/user/chart/movies`, 'movies');
+    handlePress(`http://${IP}:8080/user/chart/tv`, 'tv');
+    handlePress(`http://${IP}:8080/user/chart/youtube`, 'youtube');
+  }, []);
 
   return (
-    <View style={styles.background}>
-      <StatusBar style='auto' />
-      <Text style={styles.title1}>회원가입</Text>
-      <View style={styles.container1}>
-        <Text style={styles.text1}>
-          나 혼자 산다 통합 회원 정보를 입력해 주세요.
-        </Text>
-        <TouchableOpacity stype={styles.textcontainer} onPress={mysetting}>
-          <Text>로그인해주세요.</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={styles.container}>
+      {/* iOS 11 이상이 설치된 아이폰에만 적용됨. */}
+      <SafeAreaView>
+        <View style={{backgroundColor:'#FFFFFF'}}>
+          
+          {/* 타이틀 , 검색 */}
+          <SearchBar/>
+          <ScrollView>
+            {/* 배너 */}
+            <View style={styles.banner}>
+              <Swiper
+                showsPagination={false}
+                showsButtons={true}
+                loop={true}
+                autoplay={true}
+                autoplayTimeout={2.5}
+                buttonWrapperStyle={{paddingHorizontal: 15}}
+                >
+                <Image style={styles.searchGubun} source={require('./../assets/images/banner1.png')}/>
+                <Image style={styles.searchGubun} source={require('./../assets/images/banner2.png')}/>
+              </Swiper>
+            </View>
+
+            {/* movies */}
+            <Media title="주간 인기 영화" data={state.movies} dataKey="movies"/>
+        
+            <View style={{ height: 16, backgroundColor:'#EEEEEE' }} />
+
+            {/* tv */}
+            <Media title="주간 인기 드라마" data={state.tv} dataKey="tv"/>
+
+            <View style={{ height: 16, backgroundColor:'#EEEEEE' }} />
+
+            {/* youtube */}
+            <Media title="YouTube" data={state.youtube} dataKey="youtube"/>
+
+            <View style={{ height: 110}} />
+
+          </ScrollView>
+        </View>
+      </SafeAreaView>
     </View>
   );
 }
 
-// styles 변수 이름 답게 화면을 그려주는,
-//더 자세히는 JSX문법을 꾸며주는 내용을 담고 있습니다.
+
+// css
 const styles = StyleSheet.create({
-  background: {
+  container: {
     flex: 1,
-    backgroundColor: "#FFE5E5",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#FFFFFF'
   },
-  title1: {
-    fontSize: 40,
-    fontWeight: "bold",
-    textAlign: "center",
+  content: {
+    flex:1,
   },
-  container1: {
-    marginTop: 55,
-    width: 390,
-    height: 500,
-    backgroundColor: "white",
-    alignItems: "center",
-    justifyContent: "center",
+  searchGubun:{
+    marginLeft: 15,
+    marginRight: 15
   },
-  text1: {
-    fontSize: 25,
-    textAlign: "center",
-    margin: 20,
-  },
-});
+  banner:{
+    height: 170,
+    resizeMode:"stretch"
+  }
+})
+
+
+export default MainPage;

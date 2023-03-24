@@ -50,7 +50,7 @@ const SearchBar = () => {
   }
   
   const searchMove = (params) => {
-    navigation.navigate('RecommendSearch',{
+    navigation.navigate('MainPageSearch',{
       params,
       search,
       selectedValue,

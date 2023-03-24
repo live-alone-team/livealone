@@ -4,7 +4,7 @@ import { useRoute } from '@react-navigation/native';
 import { IP, TOKEN } from '@env';
 import { SimpleLineIcons, Entypo } from '@expo/vector-icons';
 
-const RecommendDetail = () => {
+const MainPageDetail = () => {
   const { params } = useRoute();
   const { dataKey, id } = params;
   const [item, setItem] = useState({ 
@@ -325,4 +325,4 @@ const styles = StyleSheet.create({
 })
 
 
-export default RecommendDetail;
+export default MainPageDetail;

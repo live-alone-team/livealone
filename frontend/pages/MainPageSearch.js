@@ -5,7 +5,7 @@ import { useRoute } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from './SearchBar';
 
-const RecommendSearch = () => {
+const MainPageSearch = () => {
 
   const [searchInfo, setSearchInfo] = useState([]);
   const { params } = useRoute();
@@ -16,7 +16,7 @@ const RecommendSearch = () => {
 
   const navigation = useNavigation();
   const detailMove = (dataKey, id) => {
-    navigation.navigate('RecommendDetail',{
+    navigation.navigate('MainPageDetail',{
       dataKey : dataKey,
       id : id
     });
@@ -80,4 +80,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RecommendSearch;
+export default MainPageSearch;
