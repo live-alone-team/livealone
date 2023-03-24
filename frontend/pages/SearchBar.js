@@ -10,11 +10,11 @@ const SearchBar = () => {
   const [search, setSearch] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
   const [searchValue, setSearchValue] = useState(null);
+  const [detailPage, setDetailPage] = useState(false);
   const navigation = useNavigation();
-
   const { params } = useRoute();
-  console.log(params)
 
+  
   const searchResult = async (url) => {
     try {
       const response = await fetch(url, {
@@ -31,11 +31,13 @@ const SearchBar = () => {
     }
   }; 
 
-  // useEffect(() => {
-  //   setSearch(search)
-  //   setSelectedValue(selectedValue)
-  //   setSearchValue(searchValue)
-  // }, []);
+  useEffect(() => {
+    if(params != undefined){
+      setSearch(params.search)
+      setSelectedValue(params.selectedValue)
+      setSearchValue(params.searchValue)
+    }
+  }, [detailPage]);
   
   const searchFunc = () => {
     if(!selectedValue){
@@ -54,6 +56,7 @@ const SearchBar = () => {
       selectedValue,
       searchValue
     });
+    setDetailPage(!detailPage)
   };
   
   return (
