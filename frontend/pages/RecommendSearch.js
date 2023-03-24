@@ -2,58 +2,71 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Image } from 'react-native';
 import { IP, TOKEN } from '@env';
 import { useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import SearchBar from './SearchBar';
 
 const RecommendSearch = () => {
 
+  const [searchInfo, setSearchInfo] = useState([]);
   const { params } = useRoute();
-  // const [searchInfo, setSearchInfo] = useState();
 
-  // console.log(params)
-  // const searchResult = async (url) => {
-  //   try {
-  //     const response = await fetch(url, {
-  //       method: 'GET',
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         "X-AUTH-TOKEN": TOKEN
-  //       },
-  //     })
-  //     const data = await response.json();
-  //     setSearchInfo(data.results)
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }; 
+  useEffect(() => {
+    setSearchInfo(params.params)
+  }, [params]);
 
-  // useEffect(() => {
-  //   searchResult(`http://${IP}:8080/user/search/${params.selectedValue}/${params.searchValue}`);
-  // }, []);
+  const navigation = useNavigation();
+  const detailMove = (dataKey, id) => {
+    navigation.navigate('RecommendDetail',{
+      dataKey : dataKey,
+      id : id
+    });
+  };
 
   return (
     <View style={styles.container}>
       <SafeAreaView style={{ flex: 1 }}>
         <SearchBar/>
-        {/* <ScrollView>
+        <ScrollView>
           {searchInfo && searchInfo.map((info, index) => {
+            let title = '';
+            let img = '';
+            let date = '';
+            let id = '';
+            if(params.selectedValue == 'tv'){
+              title = info.original_name
+              img = `https://image.tmdb.org/t/p/w500${info.poster_path}`
+              date = info.first_air_date
+              id = info.id
+            }else if(params.selectedValue == 'movies'){
+              title = info.title;
+              img = `https://image.tmdb.org/t/p/w500${info.poster_path}`;
+              date = info.release_date;
+              id = info.id
+            }else{
+              title = info.snippet.title
+              img = info.snippet.thumbnails.high.url
+              date = info.snippet.channelTitle
+            }
             return (
               <View key={index}>
                 <View style={{width:'100%', height: 200, alignItems: 'center', justifyContent: 'center'}}>
-                  <View style={{width:'80%', height:138, flexDirection: 'row'}}>
-                    <Image style={{width:110, height:'100%'}} source={{ url: `https://image.tmdb.org/t/p/w500${info.poster_path}` }}/>
-                    <View style={{width:202, height:'80%', alignSelf: 'center'}}>
-                      <View style={{marginLeft:31}}>
-                        <Text style={{color:'#545454', fontWeight:'900', fontSize: '18'}}>{info.title}</Text>
-                        <Text style={{color:'#B9B9B9', fontSize:'16', marginTop:13}}>{info.release_date}</Text>
+                  <TouchableOpacity onPress={params.selectedValue != 'youtube' ? () => detailMove(params.selectedValue, id) : null}>
+                    <View style={{width:'80%', height:138, flexDirection: 'row'}}>
+                      <Image style={{width:110, height:'100%'}} source={{ url: img }}/>
+                      <View style={{width:202, height:'80%', alignSelf: 'center'}}>
+                        <View style={{marginLeft:31}}>
+                          <Text style={{color:'#545454', fontWeight:'900', fontSize: '18'}}>{title}</Text>
+                          <Text style={{color:'#B9B9B9', fontSize:'16', marginTop:13}}>{date}</Text>
+                        </View>
                       </View>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 </View>
                 <View style={{borderBottomWidth: 1, borderBottomColor: '#E0E0E0', borderBottomStyle: 'solid', width: '90%', alignSelf: 'center'}} />
               </View>
             )
           })}
-        </ScrollView> */}
+        </ScrollView>
 
       </SafeAreaView>
     </View>

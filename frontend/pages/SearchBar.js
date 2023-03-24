@@ -10,9 +10,10 @@ const SearchBar = () => {
   const [search, setSearch] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
   const [searchValue, setSearchValue] = useState(null);
-  const [searchInfo, setSearchInfo] = useState('');
-  const { params, name } = useRoute();
   const navigation = useNavigation();
+
+  const { params } = useRoute();
+  console.log(params)
 
   const searchResult = async (url) => {
     try {
@@ -24,18 +25,17 @@ const SearchBar = () => {
         },
       })
       const data = await response.json();
-      setSearchInfo(data.results)
+      selectedValue == 'youtube' ? searchMove(data.items) : searchMove(data.results)
     } catch (error) {
       console.error(error);
     }
   }; 
 
-  useEffect(() => {
-    console.log(search, selectedValue, searchValue)
-    setSearch(search)
-    setSelectedValue(selectedValue)
-    setSearchValue(searchValue)
-  }, [searchInfo]);
+  // useEffect(() => {
+  //   setSearch(search)
+  //   setSelectedValue(selectedValue)
+  //   setSearchValue(searchValue)
+  // }, []);
   
   const searchFunc = () => {
     if(!selectedValue){
@@ -47,9 +47,12 @@ const SearchBar = () => {
     }
   }
   
-  const searchMove = () => {
+  const searchMove = (params) => {
     navigation.navigate('RecommendSearch',{
-      params
+      params,
+      search,
+      selectedValue,
+      searchValue
     });
   };
   
@@ -58,8 +61,7 @@ const SearchBar = () => {
       <View style={styles.topTitle}>
         {search ? (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity onPress={() => {setSearch(!search)}
-            }>
+            <TouchableOpacity onPress={() => {setSearch(!search)}}>
               <AntDesign name="arrowleft" size={22} color="black" />
             </TouchableOpacity>
             <View style={styles.searchBox}>
