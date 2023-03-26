@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, SafeAreaView, Button, StatusBar} from 'react-native';
+import { StyleSheet, View, Image, ScrollView, SafeAreaView, StatusBar } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { IP , TOKEN } from '@env';
-import SearchBar from './SearchBar';
+import MainSearchBar from './MainSearchBar';
 import Media from './Media';
 
 const MainPage = () => {
@@ -10,7 +10,7 @@ const MainPage = () => {
     movies: { title: [], image: [], id: []},
     tv: { title: [], image: [], id: []},
     youtube: {title: [], image: [] }
-  });  
+  }); 
 
   const handlePress = async (url, dataKey) => {
     try {
@@ -63,7 +63,7 @@ const MainPage = () => {
         <View style={{backgroundColor:'#FFFFFF'}}>
           
           {/* 타이틀 , 검색 */}
-          <SearchBar/>
+          <MainSearchBar/>
           <ScrollView>
             {/* 배너 */}
             <View style={styles.banner}>

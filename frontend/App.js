@@ -6,7 +6,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import Vote from './pages/Vote';
 import MainPage from './pages/MainPage';
-import Recommend from './pages/Recommend';
+import RegisterVote from './pages/RegisterVote';
 import Profile from './pages/Profile';
 import MainPageDetail from './pages/MainPageDetail';
 import MainPageSearch from './pages/MainPageSearch';
@@ -74,8 +74,8 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Recommend"
-        component={Recommend}
+        name="RegisterVote"
+        component={RegisterVote}
         options={{
           tabBarLabel: ({ focused, color }) => (
             <Text style={{ fontSize:10, color: focused ? '#FF4545' : 'gray'  }}>투표</Text>

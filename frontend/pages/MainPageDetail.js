@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, SafeAreaView, Image, TextInput, ScrollView, Tou
 import { useRoute } from '@react-navigation/native';
 import { IP, TOKEN } from '@env';
 import { SimpleLineIcons, Entypo } from '@expo/vector-icons';
-
+ 
 const MainPageDetail = () => {
   const { params } = useRoute();
   const { dataKey, id } = params;
