@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, SafeAreaView, Button} from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, SafeAreaView, Button, StatusBar} from 'react-native';
 import Swiper from 'react-native-swiper';
 import { IP , TOKEN } from '@env';
 import SearchBar from './SearchBar';
@@ -58,7 +58,8 @@ const MainPage = () => {
   return (
     <View style={styles.container}>
       {/* iOS 11 이상이 설치된 아이폰에만 적용됨. */}
-      <SafeAreaView>
+      <SafeAreaView style={{ flex: 1, backgroundColor:'#F5F5F5' }}>
+        <StatusBar barStyle="dark-content" />
         <View style={{backgroundColor:'#FFFFFF'}}>
           
           {/* 타이틀 , 검색 */}

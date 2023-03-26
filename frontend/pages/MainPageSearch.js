@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Image, StatusBar } from 'react-native';
 import { IP, TOKEN } from '@env';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
@@ -24,7 +24,8 @@ const MainPageSearch = () => {
 
   return (
     <View style={styles.container}>
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor:'#F5F5F5' }}>
+        <StatusBar barStyle="dark-content" />
         <SearchBar/>
         <ScrollView>
           {searchInfo && searchInfo.map((info, index) => {
