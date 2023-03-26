@@ -18,7 +18,7 @@ const MainPageStack = ({navigation}) => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="MainPage"
+        name="MainPageHome"
         component={MainPage}
         options={{ 
           headerShown: false,
@@ -61,8 +61,8 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Vote"
-        component={Vote}
+        name="RegisterVote"
+        component={RegisterVote}
         options={{
           tabBarLabel: ({ focused, color }) => (
             <Text style={{ fontSize:10, color: focused ? '#FF4545' : 'gray'  }}>투표 추가</Text>
@@ -74,8 +74,8 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="RegisterVote"
-        component={RegisterVote}
+        name="Vote"
+        component={Vote}
         options={{
           tabBarLabel: ({ focused, color }) => (
             <Text style={{ fontSize:10, color: focused ? '#FF4545' : 'gray'  }}>투표</Text>

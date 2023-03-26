@@ -1,20 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, ScrollView, SafeAreaView, StatusBar } from 'react-native';
-import {IP} from '@env';
+import { IP, TOKEN } from '@env';
 
 const RegisterVote = () => {
-
-  // const handlePress = async () => {
-  //   try {
-  //     const response = await fetch(`http://${IP}:8080/register`, {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({ name, email, password, nickname })
-  //     });
-  //     const json = await response.json();
-  //     console.log(json);
-  //   } catch (error) { console.error(error); }
-  // };
 
   return (
     <View style={styles.container}>

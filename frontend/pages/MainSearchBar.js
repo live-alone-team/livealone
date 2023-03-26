@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
 import { IP, TOKEN } from '@env';
 
-const SearchBar = () => {
+const MainSearchBar = () => {
   const [search, setSearch] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
   const [searchValue, setSearchValue] = useState(null);
@@ -129,4 +129,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchBar;
+export default MainSearchBar;

@@ -1,0 +1,95 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
+import { IP, TOKEN } from '@env';
+
+const VoteSearchBar = ({sendData}) => {
+  const [search, setSearch] = useState(false);
+  const [searchValue, setSearchValue] = useState(null);
+  const [searchChk, setSearchChk] = useState(false);
+
+  const searchPollList = async (url) => {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-TOKEN": TOKEN,
+          "keyword" : searchValue
+        },
+      })
+      const data = await response.json();
+      sendData(data)
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const searchFunc = () => {
+    if(!searchValue){
+      console.log(searchValue + '-2')
+    }else{
+      searchPollList(`http://${IP}:8080/user/poll/search/${searchValue}`);
+      setSearchChk(false);
+    }
+  }
+
+  useEffect(() => {
+    if(searchChk) searchFunc();
+  }, [searchChk]);
+
+  
+  
+  return (
+    <View >
+      <View style={styles.topTitle}>
+        {search ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => {setSearch(!search)}}>
+              <AntDesign name="arrowleft" size={22} color="black" />
+            </TouchableOpacity>
+            <View style={styles.searchBox}>
+              <TextInput onChangeText={setSearchValue} value={searchValue} style={styles.searchBar} placeholder="검색어를 입력하세요"
+                onSubmitEditing={() => { setSearchChk(true) }} />
+            </View>
+          </View>
+        ) : (
+          <Text style={{ fontWeight: 'bold', fontSize: 18 }}>투표</Text>
+        )}
+
+        <TouchableOpacity onPress={() => { search ? setSearchChk(true) : setSearch(!search) }}>
+          <AntDesign name="search1" size={22} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  topTitle: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 20,
+    height: 40,
+    marginBottom: 20
+  },
+  searchBox: {
+    borderWidth: 0.5,
+    borderRadius: 5,
+    borderColor: '#D0D5DA',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 20,
+  },
+  searchBar: {
+    width: 262,
+    height: 40,
+    marginLeft: 15,
+  },
+});
+
+export default VoteSearchBar;
