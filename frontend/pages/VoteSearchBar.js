@@ -2,11 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { IP, TOKEN } from '@env';
+import { useNavigation } from '@react-navigation/native';
 
-const VoteSearchBar = ({sendData}) => {
+const VoteSearchBar = () => {
   const [search, setSearch] = useState(false);
   const [searchValue, setSearchValue] = useState(null);
   const [searchChk, setSearchChk] = useState(false);
+
+  const navigation = useNavigation();
+
+  const searchMove = (params) => {
+    navigation.navigate('VoteSearch',{
+      params
+    });
+  };
 
   const searchPollList = async (url) => {
     try {
@@ -19,7 +28,7 @@ const VoteSearchBar = ({sendData}) => {
         },
       })
       const data = await response.json();
-      sendData(data)
+      searchMove(data)
     } catch (error) {
       console.error(error);
     }
@@ -41,7 +50,7 @@ const VoteSearchBar = ({sendData}) => {
   
   
   return (
-    <View >
+    <View > 
       <View style={styles.topTitle}>
         {search ? (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
