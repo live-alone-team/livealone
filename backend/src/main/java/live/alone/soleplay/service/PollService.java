@@ -148,23 +148,28 @@ public class PollService {
         pollRepository.deleteById(pollId, memberId);
     }
 
-    public List<PollSearchList> getPollContaining(String keyword) {
+    public List<PollListResponse> getPollContaining(String keyword) {
         List<Poll> polls = pollRepository.findByTitleContainingOrderByCreatedDateDesc(keyword);
         if (polls.size() == 0)
             throw new CustomException(ErrorCode.NO_SUCH_POLL);
 
-        List<PollSearchList> pollSearchLists = new ArrayList<>();
+        List<PollListResponse> pollListResponses = new ArrayList<>();
 
         for (Poll poll : polls) {
-            PollSearchList pollSearchList = PollSearchList.builder()
-                    .id(poll.getId())
+            PollListResponse pollListResponse = PollListResponse.builder()
+                    .pollId(poll.getId())
+                    .image(poll.getMember().getImage())
+                    .nickname(poll.getMember().getNickname())
                     .title(poll.getTitle())
                     .description(poll.getDescription())
-                    .createdDate(poll.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")))
+                    .expirationDate(DateMapper.calculateTime(poll.getExpirationDate()))
+                    .totalLikes(likesRepository.sumLikes(poll.getId()))
+                    .totalVotes(voteRepository.countByPollId(poll.getId()))
+                    .createdTime(poll.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")))
                     .build();
-            pollSearchLists.add(pollSearchList);
+            pollListResponses.add(pollListResponse);
         }
-        return pollSearchLists;
+        return pollListResponses;
     }
 
     public String likeOnPoll(Long pollId, Long memberId) {

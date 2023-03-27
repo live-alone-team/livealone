@@ -56,7 +56,7 @@ public class PollController {
     }
 
     @GetMapping("/search/{keyword}")
-    public ResponseEntity<List<PollSearchList>> getPollContaining(@PathVariable String keyword) {
+    public ResponseEntity<List<PollListResponse>> getPollContaining(@PathVariable String keyword) {
         return ResponseEntity.ok(pollService.getPollContaining(keyword));
     }
 
