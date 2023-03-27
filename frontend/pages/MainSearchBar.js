@@ -6,14 +6,15 @@ import { useNavigation } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
 import { IP, TOKEN } from '@env';
 
-const SearchBar = () => {
+const MainSearchBar = () => {
   const [search, setSearch] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
   const [searchValue, setSearchValue] = useState(null);
-  const [searchInfo, setSearchInfo] = useState('');
-  const { params, name } = useRoute();
+  const [detailPage, setDetailPage] = useState(false);
   const navigation = useNavigation();
+  const { params } = useRoute();
 
+  
   const searchResult = async (url) => {
     try {
       const response = await fetch(url, {
@@ -24,18 +25,19 @@ const SearchBar = () => {
         },
       })
       const data = await response.json();
-      setSearchInfo(data.results)
+      selectedValue == 'youtube' ? searchMove(data.items) : searchMove(data.results)
     } catch (error) {
       console.error(error);
     }
   }; 
 
   useEffect(() => {
-    console.log(search, selectedValue, searchValue)
-    setSearch(search)
-    setSelectedValue(selectedValue)
-    setSearchValue(searchValue)
-  }, [searchInfo]);
+    if(params != undefined){
+      setSearch(params.search)
+      setSelectedValue(params.selectedValue)
+      setSearchValue(params.searchValue)
+    }
+  }, [detailPage]);
   
   const searchFunc = () => {
     if(!selectedValue){
@@ -47,10 +49,14 @@ const SearchBar = () => {
     }
   }
   
-  const searchMove = () => {
-    navigation.navigate('RecommendSearch',{
-      params
+  const searchMove = (params) => {
+    navigation.navigate('MainPageSearch',{
+      params,
+      search,
+      selectedValue,
+      searchValue
     });
+    setDetailPage(!detailPage)
   };
   
   return (
@@ -58,8 +64,7 @@ const SearchBar = () => {
       <View style={styles.topTitle}>
         {search ? (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity onPress={() => {setSearch(!search)}
-            }>
+            <TouchableOpacity onPress={() => {setSearch(!search)}}>
               <AntDesign name="arrowleft" size={22} color="black" />
             </TouchableOpacity>
             <View style={styles.searchBox}>
@@ -124,4 +129,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchBar;
+export default MainSearchBar;

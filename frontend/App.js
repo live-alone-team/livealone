@@ -6,35 +6,35 @@ import { NavigationContainer } from '@react-navigation/native';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import Vote from './pages/Vote';
 import MainPage from './pages/MainPage';
-import Recommend from './pages/Recommend';
+import RegisterVote from './pages/RegisterVote';
 import Profile from './pages/Profile';
-import RecommendDetail from './pages/RecommendDetail';
-import RecommendSearch from './pages/RecommendSearch';
+import MainPageDetail from './pages/MainPageDetail';
+import MainPageSearch from './pages/MainPageSearch';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const RecommendStack = ({navigation}) => {
+const MainPageStack = ({navigation}) => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Recommend"
-        component={Recommend}
+        name="MainPageHome"
+        component={MainPage}
         options={{ 
           headerShown: false,
           title: ' ',
         }}
       />
       <Stack.Screen
-        name="RecommendDetail"
-        component={RecommendDetail}
+        name="MainPageDetail"
+        component={MainPageDetail}
         options={{ 
           title: '리뷰 보기',
         }}
       />
       <Stack.Screen
-        name="RecommendSearch"
-        component={RecommendSearch}
+        name="MainPageSearch"
+        component={MainPageSearch}
         options={{ 
           headerShown: false,
           title: ' ',
@@ -49,7 +49,7 @@ const TabNavigator = () => {
     <Tab.Navigator>
       <Tab.Screen
         name="MainPage"
-        component={MainPage}        
+        component={MainPageStack}        
         options={{
           tabBarLabel: ({ focused, color }) => (
             <Text style={{ fontSize:10, color: focused ? '#FF4545' : 'gray'  }}>메인 화면</Text>
@@ -61,8 +61,8 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Vote"
-        component={Vote}
+        name="RegisterVote"
+        component={RegisterVote}
         options={{
           tabBarLabel: ({ focused, color }) => (
             <Text style={{ fontSize:10, color: focused ? '#FF4545' : 'gray'  }}>투표 추가</Text>
@@ -74,8 +74,8 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Recommend"
-        component={RecommendStack}
+        name="Vote"
+        component={Vote}
         options={{
           tabBarLabel: ({ focused, color }) => (
             <Text style={{ fontSize:10, color: focused ? '#FF4545' : 'gray'  }}>투표</Text>

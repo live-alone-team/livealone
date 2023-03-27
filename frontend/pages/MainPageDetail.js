@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, SafeAreaView, Image, TextInput, ScrollView, TouchableOpacity, ActionSheetIOS, Alert } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, Image, TextInput, ScrollView, TouchableOpacity, ActionSheetIOS, Alert, StatusBar } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { IP, TOKEN } from '@env';
 import { SimpleLineIcons, Entypo } from '@expo/vector-icons';
-
-const RecommendDetail = () => {
+ 
+const MainPageDetail = () => {
   const { params } = useRoute();
   const { dataKey, id } = params;
   const [item, setItem] = useState({ 
@@ -226,7 +226,8 @@ const RecommendDetail = () => {
 
   return (
     <View style={styles.container}>
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor:'#F5F5F5' }}>
+        <StatusBar barStyle="dark-content" />
 
         {/* 영화 정보*/}
         <View style={styles.itemBox}>
@@ -325,4 +326,4 @@ const styles = StyleSheet.create({
 })
 
 
-export default RecommendDetail;
+export default MainPageDetail;

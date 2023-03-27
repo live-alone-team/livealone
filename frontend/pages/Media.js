@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 const Media = ({title, data, dataKey}) => {
   const navigation = useNavigation();
   const detailMove = (dataKey, id) => {
-    navigation.navigate('RecommendDetail',{
+    navigation.navigate('MainPageDetail',{
       dataKey : dataKey,
       id : id
     });
