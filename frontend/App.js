@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
+import Login from './pages/Login';
 import MainPage from './pages/MainPage';
 import MainPageDetail from './pages/MainPageDetail';
 import MainPageSearch from './pages/MainPageSearch';
@@ -12,7 +13,7 @@ import VoteDetail from './pages/VoteDetail';
 import VoteSearch from './pages/VoteSearch';
 import RegisterVote from './pages/RegisterVote';
 import Profile from './pages/Profile';
-
+ 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -61,13 +62,35 @@ const VoteStack = ({navigation}) => {
         name="VoteDetail"
         component={VoteDetail}
         options={{ 
-          headerShown: false,
           title: ' ',
         }}
       />
       <Stack.Screen
         name="VoteSearch"
         component={VoteSearch}
+        options={{ 
+          headerShown: false,
+          title: ' ',
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const ProfileStack = ({navigation}) => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="ProfilePage"
+        component={Profile}
+        options={{ 
+          headerShown: false,
+          title: ' ',
+        }}
+      />
+      <Stack.Screen
+        name="Login"
+        component={Login}
         options={{ 
           headerShown: false,
           title: ' ',
@@ -121,7 +144,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="Profile"
-        component={Profile}
+        component={ProfileStack}
         options={{
           tabBarLabel: ({ focused, color }) => (
             <Text style={{ fontSize:10, color: focused ? '#FF4545' : 'gray'  }}>프로필</Text>
