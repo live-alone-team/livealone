@@ -32,6 +32,10 @@ public class MemberService {
         if (found.isPresent())
             throw new CustomException(ErrorCode.ALREADY_EXISTS_EMAIL);
 
+        Optional<Member> checkingNickname = memberRepository.findByNickname(nickname);
+        if (checkingNickname.isPresent())
+            throw new CustomException(ErrorCode.ALREADY_EXISTS_NICKNAME);
+
         Member member = new Member(name, email, password, nickname, role, "None", 1);
         memberRepository.save(member);
 
