@@ -3,29 +3,12 @@ import { StyleSheet, View, ScrollView, SafeAreaView, StatusBar, Text } from 'rea
 import { IP, TOKEN } from '@env';
 import VoteSearchBar from './VoteSearchBar';
 import VoteList from './VoteList';
+import { useRoute } from '@react-navigation/native';
 
-const Vote = () => {
-  const [data, setData] = useState('');
+const VoteSearch = () => {
+  const { params } = useRoute();
 
-  const pollList = async (url) => {
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          "Content-Type": "application/json",
-          "X-AUTH-TOKEN": TOKEN
-        },
-      })
-      const data = await response.json();
-      setData(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    pollList(`http://${IP}:8080/user/poll`);
-  }, []);
+  console.log(params)
 
   return (
     <View style={styles.container}>
@@ -38,11 +21,11 @@ const Vote = () => {
             
             <ScrollView style={{ height: '100%' }}>
               {
-                data.code === 'NO_SUCH_POLL' ? 
+                params.params.code === 'NO_SUCH_POLL' ? 
                 <Text>
                   {data.detail}
                 </Text> : 
-                data && data.map((vote, index) => {
+                params.params && params.params.map((vote, index) => {
                   return (
                     <View key={index}>
                       <VoteList vote={vote} />
@@ -67,4 +50,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default Vote;
+export default VoteSearch;
