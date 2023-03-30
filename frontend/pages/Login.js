@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, TextInput, View, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import {IP} from '@env';
 import { storeToken } from './token';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation , CommonActions} from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 
 const Login = () => {
@@ -27,11 +27,18 @@ const Login = () => {
       
       if(data.hasOwnProperty('status')){
         setErrCode(data.status)
-      }
+      } 
       if(data.hasOwnProperty('jwtToken')){
         storeToken(data.jwtToken)
           .then(() => {
-            navigation.goBack()
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [
+                  { name: 'MainPage' }
+                ]
+              })
+            );
           })
           .catch((error) => {
             console.log(error);
