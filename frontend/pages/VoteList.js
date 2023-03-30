@@ -4,13 +4,15 @@ import { Entypo, FontAwesome5, EvilIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 const VoteList = ({ vote }) => {
-
+  
   const navigation = useNavigation();
-  const detailMove = (id, expirationDate) => {
+
+  // 디테일 페이지 이동
+  const detailMove = async (id) => {
     navigation.navigate('VoteDetail',{
       id : id,
-      expirationDate : expirationDate,
-    });
+    }); 
+
   };
 
   return (
@@ -64,7 +66,7 @@ const VoteList = ({ vote }) => {
           <View style={{ width: '40%', flexDirection: 'row'}}>
             <FontAwesome5 name="vote-yea" size={20} color="black" style={{marginLeft:25}} />
             <Text style={{marginLeft:10, marginTop:2}}>{vote.totalVotes} 명 참여</Text>
-          </View>
+          </View> 
           <View style={{ width: '60%' }}>
             <Text style={{textAlign:'right', marginRight: 25}}>{vote.expirationDate}</Text>
           </View>

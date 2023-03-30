@@ -4,6 +4,8 @@ import { useRoute } from '@react-navigation/native';
 import { IP, TOKEN } from '@env';
 import { SimpleLineIcons, Entypo, FontAwesome5 } from '@expo/vector-icons';
 import { CheckBox } from 'react-native-elements';
+import { getToken  } from './token';
+import { useNavigation , CommonActions, useIsFocused} from '@react-navigation/native';
  
 const VoteDetail = () => {
   const { params } = useRoute();
@@ -12,39 +14,58 @@ const VoteDetail = () => {
   const [items, setItems] = useState('');
   const [vote, setVote] = useState(false);
   const [preview, setPreview] = useState(false);
+
+  const navigation = useNavigation();  
+  const [token, setToken] = useState('');
+  const isFocused = useIsFocused();
+  
+  const chkToken = async () => {
+    const userToken = await getToken();
+    userToken
+      ? setToken(userToken)
+      : navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Login' }]
+          })
+        );
+  };
   
   const voteInfo = async (url) => {
+    const userToken = await getToken();
     try { 
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": TOKEN
+          "X-AUTH-TOKEN": userToken
         },
       })
       const data = await response.json();
-      setDetailData(data)
-
-      const newData = data.choices.map(item => ({
-        id: item.id,
-        voteCount: item.voteCount,
-        title: item.content,
-        checked: false,
-      }));
+      if(!data.hasOwnProperty('error')){
+        setDetailData(data)
+        const newData = data.choices.map(item => ({
+          id: item.id,
+          voteCount: item.voteCount,
+          title: item.content,
+          checked: false,
+        }));
+        setItems(newData)      
+      }
       
-      setItems(newData)      
     } catch (error) {
       console.error(error);
     }
   };
 
   const voteInfoPreview = async (url) => {
+    const userToken = await getToken();
     try {  
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": TOKEN
+          "X-AUTH-TOKEN": userToken
         },
       })
       const data = await response.json();
@@ -58,9 +79,17 @@ const VoteDetail = () => {
   }
   
   useEffect(() => {
-    voteInfo(`http://${IP}:8080/user/poll/${params.id}`);
-    voteInfoPreview(`http://${IP}:8080/user/poll/${params.id}/result`);
   }, []);
+  
+  useEffect(() => {
+    if (isFocused) {
+      Promise.all([
+        chkToken(),
+        voteInfo(`http://${IP}:8080/user/poll/${params.id}`),
+        voteInfoPreview(`http://${IP}:8080/user/poll/${params.id}/result`),
+      ]);
+    }
+  }, [isFocused]);
 
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => handleCheck(item)}>
@@ -77,6 +106,8 @@ const VoteDetail = () => {
   
   return (
     <View style={styles.container}>
+      {
+        detailData.hasOwnProperty('error') ? <Text>asdasdasdasd</Text> : 
       <SafeAreaView style={{ flex: 1, backgroundColor:'#FFFFFF' }}>
         <StatusBar barStyle="dark-content" />
         <View style={{ width: '100%', flexDirection: 'row' }}>
@@ -170,6 +201,7 @@ const VoteDetail = () => {
         
 
       </SafeAreaView>
+      }
     </View>
   );
 };
