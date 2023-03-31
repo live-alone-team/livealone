@@ -38,3 +38,4 @@ out/
 
 testDto.java
 TestController.java
+application-oauth.yml
