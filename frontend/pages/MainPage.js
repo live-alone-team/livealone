@@ -4,58 +4,74 @@ import Swiper from 'react-native-swiper';
 import { IP , TOKEN } from '@env';
 import MainSearchBar from './MainSearchBar';
 import Media from './Media';
+import { getToken  } from './token';
+import { useNavigation , CommonActions, useIsFocused} from '@react-navigation/native';
 
-const MainPage = () => {
+const MainPage = () => { 
   const [state, setState] = useState({ 
-    movies: { title: [], image: [], id: []},
+    movies: { title: [], image: [], id: []}, 
     tv: { title: [], image: [], id: []},
-    youtube: {title: [], image: [] }
+    youtube: {title: [], image: [] } 
   }); 
+  
+  const navigation = useNavigation();  
+
+  const [token, setToken] = useState('');
+  const isFocused = useIsFocused();
+  
+  const chkToken = async () => {
+    const userToken = await getToken();
+    userToken
+      ? setToken(userToken)
+      : navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Login' }]
+          })
+        );
+  };
 
   const handlePress = async (url, dataKey) => {
+    const userToken = await getToken();    
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": TOKEN
+          "X-AUTH-TOKEN": userToken
         },
       })
       const data = await response.json();
-      let [title, image, id] = [[],[],[]];
-
-      // youtube만 구조가 조금 다름
-      let results = dataKey === 'youtube' ? data.items : data.results;
-      results.map((item,i) => {
-        if(dataKey === 'movies'){
-          title.push(item["title"])
-          image.push(`https://image.tmdb.org/t/p/w500${item.poster_path}`);
-          id.push(item["id"]);
-        }else if(dataKey === 'tv'){
-          title.push(item["name"])
-          image.push(`https://image.tmdb.org/t/p/w500${item.poster_path}`);
-          id.push(item["id"]);
-        }else{
-          title.push(item.snippet.title)
-          image.push(`${item.snippet.thumbnails.standard.url}`);
-        }
-      });
-      setState(prevState => ({ 
-        ...prevState,
-        [dataKey]: {title, image, id}
+      const results = data.results || data.items;
+      if (!results) return;
+      const items = Array.from(results, item => ({
+        title: dataKey === 'movies' ? item.title : dataKey === 'tv' ? item.name : item.snippet.title,
+        image: dataKey === 'youtube' ? item.snippet.thumbnails.standard.url : `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+        id: item.id
       }));
+      setState(prevState => ({
+        ...prevState,
+        [dataKey]: { title: items.map(item => item.title), image: items.map(item => item.image), id: items.map(item => item.id) }
+      }));
+
     } catch (error) {
       console.error(error);
     }
   };
 
-  useEffect(() => {
-    handlePress(`http://${IP}:8080/user/chart/movies`, 'movies');
-    handlePress(`http://${IP}:8080/user/chart/tv`, 'tv');
-    handlePress(`http://${IP}:8080/user/chart/youtube`, 'youtube');
-  }, []);
 
-  return (
+  useEffect(() => {
+    if (isFocused) {
+      Promise.all([
+        chkToken(),
+        handlePress(`http://${IP}:8080/user/chart/movies`, 'movies'),
+        handlePress(`http://${IP}:8080/user/chart/tv`, 'tv'),
+        handlePress(`http://${IP}:8080/user/chart/youtube`, 'youtube')
+      ]);
+    }
+  }, [isFocused]);
+
+  return ( 
     <View style={styles.container}>
       {/* iOS 11 이상이 설치된 아이폰에만 적용됨. */}
       <SafeAreaView style={{ flex: 1, backgroundColor:'#F5F5F5' }}>

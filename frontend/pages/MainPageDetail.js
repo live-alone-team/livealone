@@ -3,6 +3,8 @@ import { StyleSheet, View, Text, SafeAreaView, Image, TextInput, ScrollView, Tou
 import { useRoute } from '@react-navigation/native';
 import { IP, TOKEN } from '@env';
 import { SimpleLineIcons, Entypo } from '@expo/vector-icons';
+import { getToken } from './token';
+import { useNavigation , CommonActions, useIsFocused} from '@react-navigation/native';
  
 const MainPageDetail = () => {
   const { params } = useRoute();
@@ -14,7 +16,7 @@ const MainPageDetail = () => {
     date : "",
     name: ""
   });
-  const [comments, setComments] = useState();
+  const [comments, setComments] = useState([]);
   const [content, setContent] = useState();
   const [edit, setEdit] = useState({
     isEditing : false,
@@ -24,18 +26,35 @@ const MainPageDetail = () => {
   const [line, setLine] = useState(9);
   const [isActivated, setIsActivated] = useState(false);
 
+  const navigation = useNavigation();  
+  const [token, setToken] = useState('');
+  const isFocused = useIsFocused();
+  
+  const chkToken = async () => {
+    const userToken = await getToken();
+    userToken
+      ? setToken(userToken)
+      : navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Login' }]
+          })
+        );
+  };
+
   const authErr = () =>
   Alert.alert('접근 권한이 없는 유저입니다.', '', [
     {text: '돌아가기'},
   ]);
 
   const findItem = async (url) => {
+    const userToken = await getToken();
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": TOKEN
+          "X-AUTH-TOKEN": userToken
         },
       })
       const data = await response.json();
@@ -66,16 +85,17 @@ const MainPageDetail = () => {
       findComment(`http://${IP}:8080/user/chart/${dataKey}/${getItem.title}/comments`);
     } catch (error) {
       console.error(error);
-    }
+    } 
   };
 
   const findComment = async (url) => {
+    const userToken = await getToken();
     try {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": TOKEN
+          "X-AUTH-TOKEN": userToken
         },
       })
       const data = await response.json();
@@ -86,12 +106,13 @@ const MainPageDetail = () => {
   };  
 
   const writeComment = async () => {
+    const userToken = await getToken();
     try {
       const response = await fetch(`http://${IP}:8080/user/chart/${dataKey}/${item.title}/comment`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": TOKEN
+          "X-AUTH-TOKEN": userToken
         },
         body: JSON.stringify({ content : content })
       })
@@ -104,12 +125,13 @@ const MainPageDetail = () => {
   };    
 
   const deleteComment = async (commentId) => {
+    const userToken = await getToken();
     try {
       const response = await fetch(`http://${IP}:8080/user/comment/${commentId}`, {
         method: 'DELETE',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": TOKEN
+          "X-AUTH-TOKEN": userToken
         },
         body: JSON.stringify({ commentId : commentId })
       })
@@ -125,12 +147,13 @@ const MainPageDetail = () => {
   };  
 
   const updateComment = async (commentId, content) => {
+    const userToken = await getToken();
     try {
       const response = await fetch(`http://${IP}:8080/user/comment/${commentId}`, {
         method: 'PATCH',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": TOKEN
+          "X-AUTH-TOKEN": userToken
         },
         body: JSON.stringify({ commentId : commentId, content: content })
       })
@@ -147,9 +170,17 @@ const MainPageDetail = () => {
     }
   };  
 
+  const handleTokenAndItem = async () => {
+    await chkToken();
+    await findItem(`http://${IP}:8080/user/${dataKey}/${id}`);
+  };
+
   useEffect(() => {
-    findItem(`http://${IP}:8080/user/${dataKey}/${id}`);
-  }, []);
+    if (isFocused) {
+      handleTokenAndItem();
+    }
+  }, [isFocused]);
+
   
   const handleLine = () => {
     isActivated ? setLine(9) : setLine(Number.MAX_SAFE_INTEGER);
@@ -263,13 +294,13 @@ const MainPageDetail = () => {
           </View> 
         </View>
 
-        {/* 댓글 입력란 */}
+        {/* 댓글 입력란 */} 
         <View style={{width: '100%', height: 50, justifyContent: 'center', alignItems: 'center'}}>
           <View style={{ flexWrap: 'wrap', fontSize: 14, width: '90%', height: '85%', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', borderWidth: 1, borderColor: '#D6D6D6', borderRadius: '5'}}>
             <View style={{ width:'85%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
               <TextInput value={content} onChangeText={setContent} style={{ width:'100%', height: '90%'}} placeholder = '댓글을 입력해주세요' />
             </View>
-            <TouchableOpacity onPress={() => {
+            <TouchableOpacity onPress={() => { 
                 if(!content){ null; }
                 // 수정
                 else if(edit.isEditing){ updateComment(edit.id, content);
@@ -285,13 +316,19 @@ const MainPageDetail = () => {
 
         {/* 댓글 */}
         <ScrollView style={{ height: '100%' }}>
-          {comments && comments.map((comment, index) => {
-            return (
-              <View key={index}>
-                {commentBox(comment)}
-              </View>
+          {
+            !Array.isArray(comments) ? (
+              <Text>No data</Text>
+            ) : (
+              comments && comments?.map((comment, index) => {
+                return (
+                  <View key={index}>
+                    {commentBox(comment)}
+                  </View>
+                )
+              })
             )
-          })}
+          }
         </ScrollView>
 
       </SafeAreaView>

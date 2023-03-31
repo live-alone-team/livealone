@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text ,TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, navigationRef } from '@react-navigation/native';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import Login from './pages/Login';
+import SignUp from './pages/SignUp';
 import MainPage from './pages/MainPage';
 import MainPageDetail from './pages/MainPageDetail';
 import MainPageSearch from './pages/MainPageSearch';
@@ -13,6 +14,9 @@ import VoteDetail from './pages/VoteDetail';
 import VoteSearch from './pages/VoteSearch';
 import RegisterVote from './pages/RegisterVote';
 import Profile from './pages/Profile';
+import InputPage from './pages/InputPage';
+import GoogleLogin from './pages/GoogleLogin';
+import { getToken, removeToken  } from './pages/token';
  
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -20,29 +24,27 @@ const Stack = createStackNavigator();
 const MainPageStack = ({navigation}) => {
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="MainPageHome"
-        component={MainPage}
-        options={{ 
-          headerShown: false,
-          title: ' ',
-        }}
-      />
-      <Stack.Screen
-        name="MainPageDetail"
-        component={MainPageDetail}
-        options={{ 
-          title: '리뷰 보기',
-        }}
-      />
-      <Stack.Screen
-        name="MainPageSearch"
-        component={MainPageSearch}
-        options={{ 
-          headerShown: false,
-          title: ' ',
-        }}
-      />
+      <Stack.Screen name="MainPageHome" component={MainPage} options={{ headerShown: false, title: ' ',}}/>
+      <Stack.Screen name="MainPageDetail" component={MainPageDetail} options={{ title: '리뷰 보기', }} />
+      <Stack.Screen name="MainPageSearch" component={MainPageSearch} options={{ headerShown: false,title: ' ',}}/>
+
+      <Stack.Screen name="Login" component={Login} options={{ headerShown: false, title: ' ' }} />
+      <Stack.Screen name="SignUp" component={SignUp} options={{ title: '회원가입' }} />
+      <Stack.Screen name="InputPage" component={InputPage} options={{ title: '회원가입' }} />
+      <Stack.Screen name="GoogleLogin" component={GoogleLogin} options={{ headerShown: false, title: ' ' }} />
+    </Stack.Navigator>
+  );
+};
+
+const RegisterVoteStack = ({navigation}) => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="RegisterVotePage" component={RegisterVote} options={{ headerShown: false, title: ' ',}}/>
+
+      <Stack.Screen name="Login" component={Login} options={{ headerShown: false, title: ' ' }} />
+      <Stack.Screen name="SignUp" component={SignUp} options={{ title: '회원가입' }} />
+      <Stack.Screen name="InputPage" component={InputPage} options={{ title: '회원가입' }} />
+      <Stack.Screen name="GoogleLogin" component={GoogleLogin} options={{ headerShown: false, title: ' ' }} />
     </Stack.Navigator>
   );
 };
@@ -50,29 +52,14 @@ const MainPageStack = ({navigation}) => {
 const VoteStack = ({navigation}) => {
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="VotePage"
-        component={Vote}
-        options={{ 
-          headerShown: false,
-          title: ' ',
-        }}
-      />
-      <Stack.Screen
-        name="VoteDetail"
-        component={VoteDetail}
-        options={{ 
-          title: ' ',
-        }}
-      />
-      <Stack.Screen
-        name="VoteSearch"
-        component={VoteSearch}
-        options={{ 
-          headerShown: false,
-          title: ' ',
-        }}
-      />
+      <Stack.Screen name="VotePage" component={Vote} options={{ headerShown: false, title: ' ',}}/>
+      <Stack.Screen name="VoteDetail" component={VoteDetail} options={{ title: ' ', }} />
+      <Stack.Screen name="VoteSearch" component={VoteSearch} options={{ headerShown: false, title: ' ', }} />
+
+      <Stack.Screen name="Login" component={Login} options={{ headerShown: false, title: ' ' }} />
+      <Stack.Screen name="SignUp" component={SignUp} options={{ title: '회원가입' }} />
+      <Stack.Screen name="InputPage" component={InputPage} options={{ title: '회원가입' }} />
+      <Stack.Screen name="GoogleLogin" component={GoogleLogin} options={{ headerShown: false, title: ' ' }} />
     </Stack.Navigator>
   );
 };
@@ -80,27 +67,29 @@ const VoteStack = ({navigation}) => {
 const ProfileStack = ({navigation}) => {
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="ProfilePage"
-        component={Profile}
-        options={{ 
-          headerShown: false,
-          title: ' ',
-        }}
-      />
-      <Stack.Screen
-        name="Login"
-        component={Login}
-        options={{ 
-          headerShown: false,
-          title: ' ',
-        }}
-      />
+      <Stack.Screen name="ProfilePage" component={Profile} options={{ headerShown: false, title: ' ' }} />
+      
+      <Stack.Screen name="Login" component={Login} options={{ headerShown: false, title: ' ' }} />
+      <Stack.Screen name="SignUp" component={SignUp} options={{ title: '회원가입' }} />
+      <Stack.Screen name="InputPage" component={InputPage} options={{ title: '회원가입' }} />
+      <Stack.Screen name="GoogleLogin" component={GoogleLogin} options={{ headerShown: false, title: ' ' }} />
     </Stack.Navigator>
   );
 };
 
-const TabNavigator = () => {
+const LoginStack = ({navigation}) => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Login" component={Login} options={{ headerShown: false, title: ' ' }} />
+      <Stack.Screen name="SignUp" component={SignUp} options={{ title: '회원가입' }} />
+      <Stack.Screen name="InputPage" component={InputPage} options={{ title: '회원가입' }} />
+      <Stack.Screen name="GoogleLogin" component={GoogleLogin} options={{ headerShown: false, title: ' ' }} />
+    </Stack.Navigator>
+  );
+};
+
+const TabNavigator = ({token}) => {
+
   return (
     <Tab.Navigator>
       <Tab.Screen
@@ -118,7 +107,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="RegisterVote"
-        component={RegisterVote}
+        component={RegisterVoteStack}
         options={{
           tabBarLabel: ({ focused, color }) => (
             <Text style={{ fontSize:10, color: focused ? '#FF4545' : 'gray'  }}>투표 추가</Text>
@@ -160,9 +149,12 @@ const TabNavigator = () => {
 };
 
 const AppNavigator = () => {
+
   return (
     <NavigationContainer>
-      <TabNavigator/>
+      {
+        <TabNavigator/>
+      }
     </NavigationContainer>
   );
 };

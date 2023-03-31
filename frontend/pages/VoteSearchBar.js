@@ -3,28 +3,30 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-nativ
 import { AntDesign } from '@expo/vector-icons';
 import { IP, TOKEN } from '@env';
 import { useNavigation } from '@react-navigation/native';
+import { getToken } from './token';
 
 const VoteSearchBar = () => {
   const [search, setSearch] = useState(false);
   const [searchValue, setSearchValue] = useState(null);
   const [searchChk, setSearchChk] = useState(false);
-
+  
   const navigation = useNavigation();
-
+  
   const searchMove = (params) => {
     navigation.navigate('VoteSearch',{
       params
     });
   };
+  
 
   const searchPollList = async (url) => {
+    const userToken = await getToken();
     try {
-      const response = await fetch(url, {
+      const response = await fetch(`${url}?keyword=${searchValue}`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": TOKEN,
-          "keyword" : searchValue
+          "X-AUTH-TOKEN": userToken,
         },
       })
       const data = await response.json();
@@ -47,8 +49,6 @@ const VoteSearchBar = () => {
     if(searchChk) searchFunc();
   }, [searchChk]);
 
-  
-  
   return (
     <View > 
       <View style={styles.topTitle}>
@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     paddingTop: 20,
     height: 40,
-    marginBottom: 20
-  },
+    marginBottom: 20 
+  }, 
   searchBox: {
     borderWidth: 0.5,
     borderRadius: 5,

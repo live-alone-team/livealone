@@ -3,17 +3,34 @@ import { StyleSheet, View, ScrollView, SafeAreaView, StatusBar, Text } from 'rea
 import { IP, TOKEN } from '@env';
 import VoteSearchBar from './VoteSearchBar';
 import VoteList from './VoteList';
+import { getToken  } from './token';
+import { useNavigation , CommonActions, useIsFocused} from '@react-navigation/native';
 
-const Vote = () => {
-  const [data, setData] = useState('');
+const Vote = () => { 
+  const navigation = useNavigation();
+  const [data, setData] = useState([]);
+  const [token, setToken] = useState('');
+  const isFocused = useIsFocused();
+  const chkToken = async () => {
+    const userToken = await getToken();
+    userToken
+      ? setToken(userToken)
+      : navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Login' }]
+          })
+        );
+  };
 
   const pollList = async (url) => {
-    try {
+    const userToken = await getToken();
+    try { 
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": TOKEN
+          "X-AUTH-TOKEN": userToken
         },
       })
       const data = await response.json();
@@ -22,10 +39,15 @@ const Vote = () => {
       console.error(error);
     }
   };
-
+  
   useEffect(() => {
-    pollList(`http://${IP}:8080/user/poll`);
-  }, []);
+    if (isFocused) {
+      Promise.all([
+        chkToken(),
+        pollList(`http://${IP}:8080/user/poll`),
+      ]);
+    }
+  }, [isFocused]);
 
   return (
     <View style={styles.container}>
@@ -37,20 +59,15 @@ const Vote = () => {
             <VoteSearchBar />
             
             <ScrollView style={{ height: '100%' }}>
-              {
-                data.code === 'NO_SUCH_POLL' ? 
-                <Text>
-                  {data.detail}
-                </Text> : 
-                data && data.map((vote, index) => {
-                  return (
-                    <View key={index}>
-                      <VoteList vote={vote} />
-                    </View>
-                  )
-                })
-              }
-            
+              {!Array.isArray(data) ? (
+                <Text>No data</Text>
+              ) : (
+                data.map((vote, index) => (
+                  <View key={index}>
+                    <VoteList vote={vote} />
+                  </View>
+                ))
+              )}            
             </ScrollView>
           </View>
 
