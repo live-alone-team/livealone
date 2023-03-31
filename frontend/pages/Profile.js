@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextInput, View, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { Button, TextInput, View, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import {IP} from '@env';
 import { removeToken  } from './token';
 import { getToken  } from './token';
@@ -12,6 +12,7 @@ const Profile = () => {
   // false => 투표내역, true => 좋아요
   const [chkBtn, setChkBtn] = useState(false);
   const isFocused = useIsFocused();
+  const [info, setInfo] = useState([]);
 
   const pollList = [
     {
@@ -75,25 +76,44 @@ const Profile = () => {
         },
       })
       const data = await response.json();
-      console.log(data)
 
     } catch (error) {
       console.error(error);
     }
   };
 
+  const getProfile = async () => {
+    const userToken = await getToken();    
+    try {
+      const response = await fetch(`http://${IP}:8080/user/profile`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-TOKEN": userToken
+        },
+      })
+      const data = await response.json();
+      setInfo(data)
+      console.log(info)
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const moveProfileEdit = () => {
+    navigation.navigate('ProfileEdit',{}); 
+  }
+
   useEffect(() => {
     if (isFocused) {
       Promise.all([
         chkToken(),
+        getProfile(),
         getMyPoll()
       ]);
     }
   }, [isFocused]);
-
-  const loginMove = () => {
-    navigation.navigate('Login',{}); 
-  };
 
   const logOut = async () => {
     removeToken()
@@ -107,6 +127,40 @@ const Profile = () => {
     );
   };
 
+  const delInfo = async () => {
+    const userToken = await getToken();    
+    console.log(userToken)
+    try {
+      const response = await fetch(`http://${IP}:8080/user/withdrawal`, {
+        method: 'DELETE',
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-TOKEN": userToken
+        },
+      })
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [
+            { name: 'Login' }
+          ]
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const delMessage = () =>
+  Alert.alert(
+    '회원탈퇴 하시겠습니까?','',
+    [
+      {text: '취소', style: 'cancel',},
+      {text: '확인', onPress: () => delInfo(),},
+    ],
+    { cancelable: false }
+  );
+
   const contents = ({ title, createdDate, index }) => (
     <View style={{flex:1}}>
       <View key={index} style={{ width: '100%', height: 70, marginLeft: 20 }}>
@@ -119,9 +173,6 @@ const Profile = () => {
     </View>
   );
   
-
-  
-
   return (
     <View style={styles.container}>
       {/* iOS 11 이상이 설치된 아이폰에만 적용됨. */}
@@ -140,9 +191,9 @@ const Profile = () => {
             <View style={{width:70, height:70, marginLeft:20,backgroundColor:'black'}}></View>
             <View style={{marginLeft:25, marginBottom:20}}>
               {/* 이름 */}
-              <Text style={{fontSize:18, fontWeight:'700', marginBottom:10}}>asdf</Text>
+              <Text style={{fontSize:18, fontWeight:'700', marginBottom:10}}>{info.name}</Text>
               {/* 닉네임 */}
-              <Text style={{color:'#FF9867'}}>asdf</Text>
+              <Text style={{color:'#FF9867'}}>{info.nickname}</Text>
             </View>
           </View>
 
@@ -207,11 +258,11 @@ const Profile = () => {
                 <Text style={{marginLeft:20, fontSize:'17', fontWeight:'500'}}>로그아웃</Text>
               </TouchableOpacity>
               <View style={{borderBottomWidth: 1, borderBottomColor: '#E0E0E0', borderBottomStyle: 'solid', width: '100%'}}/>
-              <TouchableOpacity style={{height:50, width:'100%',justifyContent: 'center'}}>
+              <TouchableOpacity onPress={moveProfileEdit} style={{height:50, width:'100%',justifyContent: 'center'}}>
                 <Text style={{marginLeft:20, fontSize:'17', fontWeight:'500'}}>프로필 수정</Text>
               </TouchableOpacity>
               <View style={{borderBottomWidth: 1, borderBottomColor: '#E0E0E0', borderBottomStyle: 'solid', width: '100%'}}/>
-              <TouchableOpacity style={{height:50, width:'100%',justifyContent: 'center'}}>
+              <TouchableOpacity onPress={delMessage} style={{height:50, width:'100%',justifyContent: 'center'}}>
                 <Text style={{marginLeft:20, fontSize:'17', fontWeight:'500'}}>회원탈퇴</Text>
               </TouchableOpacity>
               <View style={{borderBottomWidth: 1, borderBottomColor: '#E0E0E0', borderBottomStyle: 'solid', width: '100%'}}/>
