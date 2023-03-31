@@ -16,6 +16,8 @@ import RegisterVote from './pages/RegisterVote';
 import Profile from './pages/Profile';
 import InputPage from './pages/InputPage';
 import GoogleLogin from './pages/GoogleLogin';
+import ProfileEdit from './pages/ProfileEdit';
+
 import { getToken, removeToken  } from './pages/token';
  
 const Tab = createBottomTabNavigator();
@@ -68,6 +70,7 @@ const ProfileStack = ({navigation}) => {
   return (
     <Stack.Navigator>
       <Stack.Screen name="ProfilePage" component={Profile} options={{ headerShown: false, title: ' ' }} />
+      <Stack.Screen name="ProfileEdit" component={ProfileEdit} options={{ title: '프로필 수정', }} />
       
       <Stack.Screen name="Login" component={Login} options={{ headerShown: false, title: ' ' }} />
       <Stack.Screen name="SignUp" component={SignUp} options={{ title: '회원가입' }} />
@@ -84,6 +87,7 @@ const LoginStack = ({navigation}) => {
       <Stack.Screen name="SignUp" component={SignUp} options={{ title: '회원가입' }} />
       <Stack.Screen name="InputPage" component={InputPage} options={{ title: '회원가입' }} />
       <Stack.Screen name="GoogleLogin" component={GoogleLogin} options={{ headerShown: false, title: ' ' }} />
+
     </Stack.Navigator>
   );
 };
