@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, TextInput, View, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { Button, TextInput, View, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
 import { IP } from '@env';
 import { useNavigation } from '@react-navigation/native';
 import { getToken  } from './token';
@@ -12,7 +12,6 @@ const ProfileEdit = () => {
   const navigation = useNavigation();
   
   const updateProfile = async () => {
-    console.log(1)
     const userToken = await getToken();  
     const requestBody = {};
     if (nickname !== '') {
@@ -21,9 +20,6 @@ const ProfileEdit = () => {
     if (password !== '') {
       requestBody.password = password;
     }
-    console.log(2)
-    console.log(requestBody)
-    console.log(3)
     try {
       const response = await fetch(`http://${IP}:8080/user/profile`, {
         method: 'PATCH',
@@ -31,9 +27,12 @@ const ProfileEdit = () => {
           'Content-Type': 'application/json',
           "X-AUTH-TOKEN": userToken 
         },
-        body: JSON.stringify(navigation)
-      });
-      console.log(4)
+        body: JSON.stringify(requestBody)
+      }); 
+ 
+      Alert.alert('수정이 완료되었습니다.','',[
+        {text: '확인', onPress: () => navigation.goBack()},
+      ]); 
       
     } catch (error) { console.error(error); }
   };
