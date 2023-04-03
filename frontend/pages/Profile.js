@@ -13,45 +13,8 @@ const Profile = () => {
   const [chkBtn, setChkBtn] = useState(false);
   const isFocused = useIsFocused();
   const [info, setInfo] = useState([]);
-
-  const pollList = [
-    {
-        "title": "과자는?",
-        "createdDate": "2023-02-28"
-    },
-    {
-        "title": "가전은?",
-        "createdDate": "2023-02-28"
-    },
-    {
-        "title": "다들 뭐가 더 맛있나요?",
-        "createdDate": "2023-02-27"
-    },
-    {
-        "title": "옷 좀 골라주세요",
-        "createdDate": "2023-02-17"
-    },
-    {
-        "title": "과자는?",
-        "createdDate": "2023-02-28"
-    },
-    {
-        "title": "가전은?",
-        "createdDate": "2023-02-28"
-    },
-    {
-        "title": "다들 뭐가 더 맛있나요?",
-        "createdDate": "2023-02-27"
-    },
-    {
-        "title": "옷 좀 골라주세요",
-        "createdDate": "2023-02-17"
-    }
-  ]
-
-  const LikeList = [
-    
-  ]
+  const [pollList, setPollList] = useState([]);
+  const [likeList, setLikeList] = useState([]);
   
   const chkToken = async () => {
     const userToken = await getToken();
@@ -76,11 +39,30 @@ const Profile = () => {
         },
       })
       const data = await response.json();
+      setPollList(data)
 
     } catch (error) {
       console.error(error);
     }
-  };
+  }; 
+
+  const getMyLike = async () => {
+    const userToken = await getToken();    
+    try {
+      const response = await fetch(`http://${IP}:8080/user/profile/likes`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-TOKEN": userToken
+        },
+      })
+      const data = await response.json();
+      setLikeList(data)
+
+    } catch (error) {
+      console.error(error);
+    }
+  }; 
 
   const getProfile = async () => {
     const userToken = await getToken();    
@@ -94,7 +76,6 @@ const Profile = () => {
       })
       const data = await response.json();
       setInfo(data)
-      console.log(info)
 
     } catch (error) {
       console.error(error);
@@ -110,7 +91,8 @@ const Profile = () => {
       Promise.all([
         chkToken(),
         getProfile(),
-        getMyPoll()
+        getMyPoll(),
+        getMyLike()
       ]);
     }
   }, [isFocused]);
@@ -129,7 +111,6 @@ const Profile = () => {
 
   const delInfo = async () => {
     const userToken = await getToken();    
-    console.log(userToken)
     try {
       const response = await fetch(`http://${IP}:8080/user/withdrawal`, {
         method: 'DELETE',
@@ -244,7 +225,7 @@ const Profile = () => {
             {
               !chkBtn ? 
               pollList.map((item, index) => (contents({ title: item.title, createdDate: item.createdDate, index: index }))) :
-              LikeList.map((item, index) => (contents({ title: item.title, createdDate: item.createdDate, index: index })))
+              likeList.map((item, index) => (contents({ title: item.title, createdDate: item.createdDate, index: index })))
             }
 
             <View style={{borderBottomWidth: 10, borderBottomColor: '#E0E0E0', borderBottomStyle: 'solid', width: '100%'}}/>
