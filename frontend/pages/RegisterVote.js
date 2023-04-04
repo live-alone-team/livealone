@@ -1,12 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, ScrollView, SafeAreaView, StatusBar, Text, TouchableOpacity, TextInput } from 'react-native';
 import { IP, TOKEN } from '@env';
+import SelectDropdown from 'react-native-select-dropdown'
+import { useNavigation , CommonActions, useIsFocused} from '@react-navigation/native';
+import { getToken  } from './token';
+import { SimpleLineIcons, Entypo, FontAwesome5 } from '@expo/vector-icons';
 
 const RegisterVote = () => {
 
   const [title, setTitle] = useState(''); 
   const [content, setContent] = useState(''); 
   const [contentsVal, setContentsVal] = useState('');
+  const day = ["0","1","2","3","4","5","6","7"]
+  const hour = [ "0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"]
+  const minute = [
+    "0","1","2","3","4","5","6","7","8","9",
+    "10","11","12","13","14","15","16","17","18","19",
+    "20","21","22","23","24","25","26","27","28","29",
+    "30","31","32","33","34","35","36","37","38","39",
+    "40","41","42","43","44","45","46","47","48","49",
+    "50","51","52","53","54","55","56","57","58","59",
+  ]
+
+  const navigation = useNavigation();
+
+  const [token, setToken] = useState('');
+  const isFocused = useIsFocused();
+  const chkToken = async () => {
+    const userToken = await getToken();
+    userToken
+      ? setToken(userToken)
+      : navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Login' }]
+          })
+        );
+  };
+
+  useEffect(() => {
+    if (isFocused) {
+      chkToken()
+    }
+  }, [isFocused]);
+
+  const addVoteMove = () => {
+    navigation.navigate('AddVote',{
+      
+    });
+  };
 
   return (
     <View style={styles.container}> 
@@ -39,8 +81,8 @@ const RegisterVote = () => {
             <View style={{width:'90%', height:'100%', marginTop:15, borderWidth: 1, borderColor: '#D6D6D6', borderRadius: '5'}}>
               {/* 투표추가 */}
               <View style={{width:'100%', height:'35%' }}>
-                <TouchableOpacity style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                  <Text style={{fontSize:'20'}}>투표추가</Text>
+                <TouchableOpacity onPress={() => addVoteMove()} style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                  <Text style={{fontSize:18}}>투표추가</Text>
                 </TouchableOpacity>
               </View>              
               <View style={{alignItems: 'center'}}>
@@ -49,7 +91,95 @@ const RegisterVote = () => {
 
               {/* 투표 기간 */}
               <View style={{width:'100%', height:'65%' }}>
-                
+                <View style={{width:'100%', height:'40%', justifyContent:'flex-end', marginLeft:30,justifyContent: 'center'}}>
+                  <Text style={{fontSize:18}}>
+                    투표기간
+                  </Text>
+                </View>
+                <View style={{width:'100%', height:'60%', marginTop:10, flexDirection: 'row',}}>
+
+                  <View style={{width:'33%',height:'100%',}}>
+                    <View style={{alignItems: 'center', marginRight:30}}>
+                      <Text>일</Text>
+                    </View>
+                    <View>
+                      <SelectDropdown 
+                        rowTextStyle={{fontSize:'17'}}
+                        dropdownStyle={{width:100}}
+                        buttonStyle={{width:100, backgroundColor:'white'}}
+                        defaultButtonText='0'
+                        data={day}
+                        onSelect={(selectedItem, index) => {
+                          console.log(selectedItem, index)
+                        }}
+                        buttonTextAfterSelection={(selectedItem, index) => {
+                          return selectedItem
+                        }}
+                        rowTextForSelection={(item, index) => {
+                          return item
+                        }}
+                        renderDropdownIcon={isOpened => {
+                          return <FontAwesome5 name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#444'} size={18} />;
+                        }}
+                      />
+                    </View>
+                  </View>
+
+                  <View style={{width:'33%',height:'100%'}}>
+                    <View style={{alignItems: 'center', marginRight:30}}>
+                      <Text>시</Text>
+                    </View>
+                    <View>
+                      <SelectDropdown 
+                        rowTextStyle={{fontSize:'17'}}
+                        dropdownStyle={{width:100}}
+                        buttonStyle={{width:100, backgroundColor:'white'}}
+                        defaultButtonText='0'
+                        data={hour}
+                        onSelect={(selectedItem, index) => {
+                          console.log(selectedItem, index)
+                        }}
+                        buttonTextAfterSelection={(selectedItem, index) => {
+                          return selectedItem
+                        }}
+                        rowTextForSelection={(item, index) => {
+                          return item
+                        }}
+                        renderDropdownIcon={isOpened => {
+                          return <FontAwesome5 name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#444'} size={18} />;
+                        }}
+                      />
+                    </View>
+                  </View>
+
+                  <View style={{width:'33%',height:'100%'}}>
+                    <View style={{alignItems: 'center', marginRight:30}}>
+                      <Text>분</Text>
+                    </View>
+                    <View>
+                      <SelectDropdown  
+                        rowTextStyle={{fontSize:'17'}}
+                        dropdownStyle={{width:100}}
+                        buttonStyle={{width:100, backgroundColor:'white'}}
+                        defaultButtonText='0'
+                        data={minute}
+                        onSelect={(selectedItem, index) => {
+                          console.log(selectedItem, index)
+                        }}
+                        buttonTextAfterSelection={(selectedItem, index) => {
+                          return selectedItem
+                        }}
+                        rowTextForSelection={(item, index) => {
+                          return item
+                        }}
+                        renderDropdownIcon={isOpened => {
+                          return <FontAwesome5 name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#444'} size={18} />;
+                        }}
+                      />
+                    </View>
+                  </View>
+
+                </View>
               </View>
             </View>
           </View>
