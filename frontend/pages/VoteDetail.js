@@ -14,13 +14,14 @@ const VoteDetail = () => {
   const [items, setItems] = useState('');
   const [vote, setVote] = useState(false);
   const [preview, setPreview] = useState(false);
+  const voteColor = ['#FF4545', '#8EFF52', '#9742FC','#FCFA68', '#FC4EFC']
 
   const navigation = useNavigation();  
   const [token, setToken] = useState('');
   const isFocused = useIsFocused();
   
   const chkToken = async () => {
-    const userToken = await getToken();
+    const userToken = await getToken(); 
     userToken
       ? setToken(userToken)
       : navigation.dispatch(
@@ -50,14 +51,15 @@ const VoteDetail = () => {
           title: item.content,
           checked: false,
         }));
-        setItems(newData)      
+        setItems(newData) 
       }
       
-    } catch (error) {
+    } catch (error) { 
       console.error(error);
     }
   };
 
+  // 미리보기 데이터
   const voteInfoPreview = async (url) => {
     const userToken = await getToken();
     try {  
@@ -69,6 +71,16 @@ const VoteDetail = () => {
         },
       })
       const data = await response.json();
+      if(!data.hasOwnProperty('error')){
+        const newData = data.choices.map((item, index) => ({
+          id: item.id,
+          chkWidth:  ((item.voteCount / data.totalVotes) * 100)+'%' ,
+          unChkWidth: (100 - ((item.voteCount / data.totalVotes) * 100))+'%' ,
+          title: item.content,
+          index: index
+        }));
+        setDetailPreviewData(newData)
+      }
     } catch (error) {
       console.error(error);
     }
@@ -103,6 +115,25 @@ const VoteDetail = () => {
       </View>
     </TouchableOpacity>
   );
+
+  const preiewItem = ({ item }) => {
+    const index = item.index % voteColor.length;
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 20, width: '100%', height: 75 }}>
+        <View style={{ width: '100%', height: '100%', justifyContent: 'center', borderWidth: 1, borderColor: '#D6D6D6', borderRadius: 5 }}>
+          <View style={{ flexDirection: 'row', width: '100%', height: '100%' }}>
+            <View style={{ width: item.chkWidth, backgroundColor: voteColor[index], borderTopLeftRadius: 5, borderBottomLeftRadius: 5 }} />
+            <View style={{ width: item.unChkWidth, backgroundColor: '#D6D6D6', borderTopRightRadius: 5, borderBottomRightRadius: 5 }} />
+          </View>
+          <Text style={{ marginLeft: 10, position: 'absolute' }}>{item.title}</Text>
+          <Text style={{ marginRight: 20, position: 'absolute', right: 0 }}>{item.chkWidth}</Text>
+        </View>
+      </View>
+    )
+  };
+  
+
+
   
   return (
     <View style={styles.container}>
@@ -147,7 +178,7 @@ const VoteDetail = () => {
           </TouchableOpacity>
         </View>
 
-        {/* 투표 */}
+        {/* 투표 리스트 */}
         <View style={{alignItems: 'center'}}>
           <View style={{width:'90%', height:230, borderWidth: 1, borderColor: '#D6D6D6', borderRadius: '5' }}>
             <View style={{width:'100%',height:70, justifyContent:'center'}}>
@@ -158,16 +189,29 @@ const VoteDetail = () => {
               </View>
             </View>
             <SafeAreaView style={{ flex: 1 }}>
-              <FlatList
-                data={items}
-                renderItem={renderItem}
-                keyExtractor={item => item.id.toString()}
-              />
+              {
+                // 투표 전
+                !vote && !preview ? 
+                <FlatList
+                  data={items}
+                  renderItem={renderItem}
+                  keyExtractor={item => item.id.toString()}
+                /> 
+                // 투표 미리보기
+                : !vote && preview ?
+                <FlatList
+                  data={detailPreviewData}
+                  renderItem={preiewItem}
+                  keyExtractor={item => item.id.toString()}
+                /> 
+                // 투표 완료 
+                : null
+              }
             </SafeAreaView>
           </View>
         </View>
 
-        {/* 투표하기 */}
+        {/* 투표 */}
         { !vote && !preview ?
           <View style={{alignItems: 'center', justifyContent: 'center', height:50, marginTop:20, }}>
             <View style={{flex: 1, width:'90%', height:'100%'}}>

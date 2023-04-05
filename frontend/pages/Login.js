@@ -13,7 +13,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [errCode, setErrCode] = useState('');
 
-  const SignIn = async () => {
+  const SignIn = async () => { 
     try {
       const response = await fetch(`http://${IP}:8080/login`, {
         method: 'POST',
@@ -91,7 +91,7 @@ const Login = () => {
               <Text style={{fontSize: 16, width:'100%', height:'33%'}}>
                 비밀번호
               </Text>
-              <TextInput onChangeText={setPassword} value={password} placeholder="비밀번호를 입력해주세요" style={{fontSize: 18,width:'100%', height:'33%'}}/>
+              <TextInput secureTextEntry={true} onChangeText={setPassword} value={password} placeholder="비밀번호를 입력해주세요" style={{fontSize: 18,width:'100%', height:'33%'}}/>
               <View style={{borderBottomWidth: 1, borderBottomColor: '#E0E0E0', borderBottomStyle: 'solid', width: '100%'}}/>
               <View style={{width:'100%', height:'33%'}}>
                 {
