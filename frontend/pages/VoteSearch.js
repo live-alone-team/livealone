@@ -8,9 +8,7 @@ import { useRoute } from '@react-navigation/native';
 const VoteSearch = () => {
   const { params } = useRoute();
 
-  console.log(params)
-
-  return (
+  return (  
     <View style={styles.container}>
       {/* iOS 11 이상이 설치된 아이폰에만 적용됨. */}
       <SafeAreaView style={{ flex: 1, backgroundColor:'#F5F5F5' }}>
@@ -21,10 +19,13 @@ const VoteSearch = () => {
             
             <ScrollView style={{ height: '100%' }}>
               {
-                params.params.code === 'NO_SUCH_POLL' ? 
-                <Text>
-                  {data.detail}
-                </Text> : 
+                params.params.hasOwnProperty('error') ? 
+                <View style={{width:'100%', height:500, alignItems: 'center', justifyContent: 'center'}}>
+                  <Text style={{fontSize:'20', fontWeight:'500'}}>
+                    {params.params.detail}
+                  </Text>   
+                </View>
+                : 
                 params.params && params.params.map((vote, index) => {
                   return (
                     <View key={index}>
@@ -35,14 +36,14 @@ const VoteSearch = () => {
               }
             
             </ScrollView>
-          </View>
+          </View> 
 
       </SafeAreaView>
     </View>
   );
-};
+}; 
 
-// css
+// css 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
