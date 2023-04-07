@@ -2,18 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { FlatList, StyleSheet, View, Text, SafeAreaView, Image, TextInput, ScrollView, TouchableOpacity, ActionSheetIOS, Alert, StatusBar } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { IP, TOKEN } from '@env';
-import { SimpleLineIcons, Entypo, FontAwesome5 } from '@expo/vector-icons';
+import { SimpleLineIcons, Entypo, FontAwesome5, EvilIcons } from '@expo/vector-icons';
 import { CheckBox } from 'react-native-elements';
 import { getToken  } from './token';
 import { useNavigation , CommonActions, useIsFocused} from '@react-navigation/native';
+
  
-const VoteDetail = () => {
-  const { params } = useRoute();
+const VoteDetail = (id, isContained) => {
+  const { params } = useRoute(); 
   const [detailData, setDetailData] = useState('');
   const [detailPreviewData, setDetailPreviewData] = useState('');
   const [items, setItems] = useState('');
   const [vote, setVote] = useState(false);
   const [preview, setPreview] = useState(false);
+  const [chkLike, setChkLike] = useState(isContained);
+  const [like, setLike] = useState(0); 
   const voteColor = ['#FF4545', '#8EFF52', '#9742FC','#FCFA68', '#FC4EFC']
 
   const navigation = useNavigation();  
@@ -31,8 +34,84 @@ const VoteDetail = () => {
           })
         );
   };
+
+  const voteBtn = () =>
+  ActionSheetIOS.showActionSheetWithOptions(
+    {
+      options: ['취소', '삭제'],
+      destructiveButtonIndex: 1,
+      cancelButtonIndex: 0,
+      userInterfaceStyle: 'dark',
+    },
+    buttonIndex => {
+      // 취소 버튼
+      if (buttonIndex === 0) {
+        
+      // 삭제 버튼
+      } else if (buttonIndex === 1) {
+        Alert.alert(
+          '게시물을 삭제 하시겠습니까?','',
+          [
+            {text: '취소', style: 'cancel',},
+            {text: '확인', onPress: () => deleteDetailVote(),},
+          ],
+          { cancelable: false }
+        );
+        
+      }
+    },
+  );  
+
+  // 투표 삭제
+  const deleteDetailVote = async () => {
+    const userToken = await getToken();
+    try {
+      const response = await fetch(`http://${IP}:8080/user/poll/${params.id}`, {
+        method: 'DELETE',
+        headers: {
+          "Content-Type": "application/json", 
+          "X-AUTH-TOKEN": userToken
+        }, 
+      })
+    } catch (error) {
+      console.error(error);
+    }
+    navigation.goBack();
+  }; 
+
+
+  // 투표 하기
+  const voting = async () => { 
+    const selectedItemId = items.find(item => item.checked)?.id;
+    if(selectedItemId === undefined) {
+      Alert.alert('투표항목을 선택하여주세요.','',[{text: '확인'},]);
+    }else{
+      try { 
+        const userToken = await getToken();
+        const response = await fetch(`http://${IP}:8080/user/poll/${params.id}/votes`, {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json",
+            "X-AUTH-TOKEN": userToken
+          },
+          body: JSON.stringify({ 
+            choiceId: selectedItemId
+          })
+        });
+        const data = await response.json();
+        if(data.hasOwnProperty('status')){
+          Alert.alert(data.detail,'',[{text: '확인'},]);
+          return
+        }
+        setVote(true)
+        setDetailPreviewData(data)
+        
+      } catch (error) { console.error(error); }      
+    }
+  };
   
-  const voteInfo = async (url) => {
+  // 투표 데이터
+  const voteInfo = async (url) => { 
     const userToken = await getToken();
     try { 
       const response = await fetch(url, {
@@ -51,13 +130,37 @@ const VoteDetail = () => {
           title: item.content,
           checked: false,
         }));
-        setItems(newData) 
+        setItems(newData)
+        setLike(data.totalLikes)
       }
       
     } catch (error) { 
       console.error(error);
     }
   };
+
+  // 좋아요
+  const pushLike = async () => { 
+    const userToken = await getToken();
+    try { 
+      const response = await fetch(`http://${IP}:8080/user/poll/like/${params.id}`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-TOKEN": userToken
+        },
+      })
+    } catch (error) { 
+      console.error(error);
+    }
+  };
+
+  const btnLike = async () => {
+    await pushLike();
+    setChkLike(!chkLike);
+    await voteInfo(`http://${IP}:8080/user/poll/${params.id}`);
+  };
+  
 
   // 미리보기 데이터
   const voteInfoPreview = async (url) => {
@@ -72,13 +175,15 @@ const VoteDetail = () => {
       })
       const data = await response.json();
       if(!data.hasOwnProperty('error')){
-        const newData = data.choices.map((item, index) => ({
-          id: item.id,
-          chkWidth:  ((item.voteCount / data.totalVotes) * 100)+'%' ,
-          unChkWidth: (100 - ((item.voteCount / data.totalVotes) * 100))+'%' ,
-          title: item.content,
-          index: index
-        }));
+        const newData = data.choices.map((item, index) => {
+          const val = isNaN(item.voteCount / data.totalVotes) ? 0 : (item.voteCount / data.totalVotes).toFixed(2);
+          const chkWidth = (val * 100) + '%';
+          const unChkWidth = (100 - (val * 100)) + '%';
+          const title = item.content;
+          const id = item.id;
+          return { id, chkWidth, unChkWidth, title };
+        });
+
         setDetailPreviewData(newData)
       }
     } catch (error) {
@@ -107,6 +212,7 @@ const VoteDetail = () => {
     <TouchableOpacity onPress={() => handleCheck(item)}>
       <View style={{ flexDirection: 'row', alignItems: 'center', padding: 10}}>
         <CheckBox
+          value={item.id}
           checked={item.checked}
           onPress={() => handleCheck(item)}
           checkedColor="#FF4545"
@@ -117,8 +223,12 @@ const VoteDetail = () => {
   );
 
   const preiewItem = ({ item }) => {
-    const index = item.index % voteColor.length;
-    return (
+    let index = 0;
+    for(let i = 0; i < items.length; i++){
+      if(items[i].id == item.id) index = i 
+    }
+    // const index = item.index % voteColor.length;
+    return ( 
       <View style={{ flexDirection: 'row', alignItems: 'center', padding: 20, width: '100%', height: 75 }}>
         <View style={{ width: '100%', height: '100%', justifyContent: 'center', borderWidth: 1, borderColor: '#D6D6D6', borderRadius: 5 }}>
           <View style={{ flexDirection: 'row', width: '100%', height: '100%' }}>
@@ -129,16 +239,13 @@ const VoteDetail = () => {
           <Text style={{ marginRight: 20, position: 'absolute', right: 0 }}>{item.chkWidth}</Text>
         </View>
       </View>
-    )
+    ) 
   };
-  
-
-
   
   return (
     <View style={styles.container}>
       {
-        detailData.hasOwnProperty('error') ? <Text>asdasdasdasd</Text> : 
+        detailData.hasOwnProperty('error') ? <Text></Text> : 
       <SafeAreaView style={{ flex: 1, backgroundColor:'#FFFFFF' }}>
         <StatusBar barStyle="dark-content" />
         <View style={{ width: '100%', flexDirection: 'row' }}>
@@ -173,7 +280,7 @@ const VoteDetail = () => {
               </Text>
             </View>
           </View>
-          <TouchableOpacity >
+          <TouchableOpacity onPress={() => voteBtn()} >
             <Entypo name="dots-three-horizontal" size={20} color="black" style={{marginTop: 30, marginLeft: 5}}/>
           </TouchableOpacity>
         </View>
@@ -205,7 +312,12 @@ const VoteDetail = () => {
                   keyExtractor={item => item.id.toString()}
                 /> 
                 // 투표 완료 
-                : null
+                : 
+                <FlatList
+                  data={detailPreviewData}
+                  renderItem={preiewItem}
+                  keyExtractor={item => item.id.toString()}
+                /> 
               }
             </SafeAreaView>
           </View>
@@ -215,7 +327,7 @@ const VoteDetail = () => {
         { !vote && !preview ?
           <View style={{alignItems: 'center', justifyContent: 'center', height:50, marginTop:20, }}>
             <View style={{flex: 1, width:'90%', height:'100%'}}>
-              <TouchableOpacity style={{width:'100%', height:'100%'}}>
+              <TouchableOpacity onPress={voting} style={{width:'100%', height:'100%'}}>
                 <View style={{width:'100%', height:'100%', borderWidth: 1, borderColor: '#D6D6D6', borderRadius: '5', justifyContent: 'center', alignItems: 'center', backgroundColor:'#FF4545'}}>
                   <Text style={{fontSize:20, textAlign: 'center', textAlignVertical: 'center', color:'white'}}>
                     투표
@@ -242,8 +354,19 @@ const VoteDetail = () => {
           </View>
           : null
         }
-        
 
+        <View style={{alignItems: 'center', justifyContent: 'center', marginTop: 25}}>
+          <View style={{width:'90%', height:50, }}>
+            <TouchableOpacity onPress={() => btnLike()} style={{width:80, height:50, flexDirection: 'row'}}>
+              {
+                chkLike ? <Entypo name="heart" size={20} color="#FF4545" /> : <EvilIcons name="heart" size={24} color="#C4C4C4" />
+              }
+              <View> 
+                {like === 0 ? <Text style={{marginTop:2}}>좋아요</Text> : <Text style={{marginTop:1}}>{like}</Text>}
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
       </SafeAreaView>
       }
     </View>
