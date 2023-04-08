@@ -52,20 +52,19 @@ public class MemberController {
 
     @PostMapping("/profile/image")
     public ResponseEntity<UploadFileResponse> uploadProfile(@RequestPart MultipartFile file,
-                                                HttpServletRequest request,
                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Long memberId = userDetails.getMember().getId();
 
-        String fileName = file.getOriginalFilename();
-        String filePath = request.getSession().getServletContext().getRealPath("/");
+        String fileDir = "여기에 주소를 '절대경로 + \\'로 넣어주세요";
+        String original = file.getOriginalFilename();
+        String savedPath = fileDir + original;
+
         try {
-            file.transferTo(new File(filePath + fileName));
-            System.out.println("이미지 저장 완료");
+            file.transferTo(new File(savedPath));
         } catch (IOException e) {
             throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
         }
-
-        return ResponseEntity.ok(memberService.uploadProfile(fileName, memberId));
+        return ResponseEntity.ok(memberService.uploadProfile(original, memberId));
     }
 
     @DeleteMapping("/withdrawal")
