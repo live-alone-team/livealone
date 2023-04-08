@@ -1,49 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ActionSheetIOS, Alert } from 'react-native';
 import { Entypo, FontAwesome5, EvilIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { getToken  } from './token';
 import { IP, TOKEN } from '@env';
 
-const VoteList = ({ vote, isContained }) => {
+const VoteList = ({ vote }) => {
   const navigation = useNavigation();
   const [isDelete, setIsDelete] = useState(false);
 
   // 디테일 페이지 이동
-  const detailMove = async (id, isContained) => {
+  const detailMove = (vote) => {
     navigation.navigate('VoteDetail',{
-      id : id, 
-      isContained : isContained
+      vote : vote
     }); 
-
-    
   }; 
-  const voteBtn = (id) =>
-  ActionSheetIOS.showActionSheetWithOptions(
-    {
-      options: ['취소', '삭제'],
-      destructiveButtonIndex: 1,
-      cancelButtonIndex: 0,
-      userInterfaceStyle: 'dark',
-    },
-    buttonIndex => {
-      // 취소 버튼
-      if (buttonIndex === 0) {
-        
-      // 삭제 버튼
-      } else if (buttonIndex === 1) {
-        Alert.alert(
-          '게시물을 삭제 하시겠습니까?','',
-          [
-            {text: '취소', style: 'cancel',},
-            {text: '확인', onPress: () => deleteVote(id),},
-          ],
-          { cancelable: false }
-        );
-        
-      }
-    },
-  );  
+
+  const voteBtn = (id) => {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ['취소', '삭제'],
+        destructiveButtonIndex: 1,
+        cancelButtonIndex: 0,
+        userInterfaceStyle: 'dark',
+      },
+      async buttonIndex => {
+        if (buttonIndex === 1) {
+          await deleteVote(id);
+        }
+      },
+    );
+  };
 
   const deleteVote = async (voteId) => {
     const userToken = await getToken();
@@ -56,7 +43,7 @@ const VoteList = ({ vote, isContained }) => {
         },
       })
       if (response.ok) {
-        setIsDelete(true)
+        setIsDelete(true)  
       }
       
     } catch (error) {
@@ -64,9 +51,9 @@ const VoteList = ({ vote, isContained }) => {
     }
   }; 
 
-  if (isDelete) {
-    return null; 
-  }
+  if (isDelete) return null; 
+
+  
   
   return (
     
@@ -93,7 +80,7 @@ const VoteList = ({ vote, isContained }) => {
               </Text>
             </View>
 
-            <TouchableOpacity onPress={() => detailMove(vote.pollId)}>
+            <TouchableOpacity onPress={() => detailMove(vote)}>
               {/* 제목 */}
               <Text style={{width: '100%', height: 40, fontSize:20, fontWeight:'500'}}>
                 {vote.title}
@@ -130,11 +117,17 @@ const VoteList = ({ vote, isContained }) => {
       {/* 좋아요 수 */}
       <View style={{ flexDirection: 'row', marginLeft: 35, marginTop: 10, marginBottom: 20 }}>
         {
-          isContained ? <Entypo name="heart" size={20} color="#FF4545" /> : <EvilIcons name="heart" size={24} color="#C4C4C4" />
+          vote.chkLike? (
+              <Entypo name="heart" size={20} color="#FF4545" />
+            ) : (
+              <EvilIcons name="heart" size={24} color="#C4C4C4" />
+          )
         }
         
         <View> 
-          {vote.totalLikes === 0 ? <Text style={{marginTop:2}}>좋아요</Text> : <Text style={{marginTop:1}}>{vote.totalLikes}</Text>}
+          <Text style={{marginTop: vote.totalLikes === 0 ? 2 : 1}}>
+            {vote.totalLikes || '좋아요'}
+          </Text>
         </View>
       </View>
 

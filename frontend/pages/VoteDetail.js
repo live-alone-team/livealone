@@ -8,31 +8,31 @@ import { getToken  } from './token';
 import { useNavigation , CommonActions, useIsFocused} from '@react-navigation/native';
 
  
-const VoteDetail = (id, isContained) => {
-  const { params } = useRoute(); 
+const VoteDetail = (props) => {
+  
   const [detailData, setDetailData] = useState('');
   const [detailPreviewData, setDetailPreviewData] = useState('');
   const [items, setItems] = useState('');
   const [vote, setVote] = useState(false);
   const [preview, setPreview] = useState(false);
-  const [chkLike, setChkLike] = useState(isContained);
-  const [like, setLike] = useState(0); 
+  const [chkLike, setChkLike] = useState(props.route.params.vote.chkLike);
+  const [like, setLike] = useState(props.route.params.vote.totalLikes); 
   const voteColor = ['#FF4545', '#8EFF52', '#9742FC','#FCFA68', '#FC4EFC']
 
   const navigation = useNavigation();  
-  const [token, setToken] = useState('');
   const isFocused = useIsFocused();
+
   
   const chkToken = async () => {
     const userToken = await getToken(); 
-    userToken
-      ? setToken(userToken)
-      : navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{ name: 'Login' }]
-          })
-        );
+    if(!userToken){
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'Login' }]
+        })
+      );
+    }
   };
 
   const voteBtn = () =>
@@ -66,7 +66,7 @@ const VoteDetail = (id, isContained) => {
   const deleteDetailVote = async () => {
     const userToken = await getToken();
     try {
-      const response = await fetch(`http://${IP}:8080/user/poll/${params.id}`, {
+      const response = await fetch(`http://${IP}:8080/user/poll/${props.route.params.vote.pollId}`, {
         method: 'DELETE',
         headers: {
           "Content-Type": "application/json", 
@@ -88,7 +88,7 @@ const VoteDetail = (id, isContained) => {
     }else{
       try { 
         const userToken = await getToken();
-        const response = await fetch(`http://${IP}:8080/user/poll/${params.id}/votes`, {
+        const response = await fetch(`http://${IP}:8080/user/poll/${props.route.params.vote.pollId}/votes`, {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",
@@ -97,7 +97,7 @@ const VoteDetail = (id, isContained) => {
           body: JSON.stringify({ 
             choiceId: selectedItemId
           })
-        });
+        }); 
         const data = await response.json();
         if(data.hasOwnProperty('status')){
           Alert.alert(data.detail,'',[{text: '확인'},]);
@@ -131,7 +131,6 @@ const VoteDetail = (id, isContained) => {
           checked: false,
         }));
         setItems(newData)
-        setLike(data.totalLikes)
       }
       
     } catch (error) { 
@@ -143,7 +142,7 @@ const VoteDetail = (id, isContained) => {
   const pushLike = async () => { 
     const userToken = await getToken();
     try { 
-      const response = await fetch(`http://${IP}:8080/user/poll/like/${params.id}`, {
+      const response = await fetch(`http://${IP}:8080/user/poll/like/${props.route.params.vote.pollId}`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -155,10 +154,14 @@ const VoteDetail = (id, isContained) => {
     }
   };
 
-  const btnLike = async () => {
-    await pushLike();
+  const btnLike = () => {
+    pushLike();
+    
+    var updatedLike = props.route.params.vote.totalLikes
+    chkLike ? updatedLike -= 1 : updatedLike += 1
     setChkLike(!chkLike);
-    await voteInfo(`http://${IP}:8080/user/poll/${params.id}`);
+    setLike(updatedLike)
+
   };
   
 
@@ -196,14 +199,11 @@ const VoteDetail = (id, isContained) => {
   }
   
   useEffect(() => {
-  }, []);
-  
-  useEffect(() => {
     if (isFocused) {
       Promise.all([
         chkToken(),
-        voteInfo(`http://${IP}:8080/user/poll/${params.id}`),
-        voteInfoPreview(`http://${IP}:8080/user/poll/${params.id}/result`),
+        voteInfo(`http://${IP}:8080/user/poll/${props.route.params.vote.pollId}`),
+        voteInfoPreview(`http://${IP}:8080/user/poll/${props.route.params.vote.pollId}/result`),
       ]);
     }
   }, [isFocused]);
@@ -227,7 +227,7 @@ const VoteDetail = (id, isContained) => {
     for(let i = 0; i < items.length; i++){
       if(items[i].id == item.id) index = i 
     }
-    // const index = item.index % voteColor.length;
+    
     return ( 
       <View style={{ flexDirection: 'row', alignItems: 'center', padding: 20, width: '100%', height: 75 }}>
         <View style={{ width: '100%', height: '100%', justifyContent: 'center', borderWidth: 1, borderColor: '#D6D6D6', borderRadius: 5 }}>
