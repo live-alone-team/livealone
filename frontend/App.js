@@ -13,6 +13,7 @@ import Vote from './pages/Vote';
 import VoteDetail from './pages/VoteDetail';
 import VoteSearch from './pages/VoteSearch';
 import RegisterVote from './pages/RegisterVote';
+import AddVote from './pages/AddVote';
 import Profile from './pages/Profile';
 import InputPage from './pages/InputPage';
 import GoogleLogin from './pages/GoogleLogin';
@@ -42,6 +43,7 @@ const RegisterVoteStack = ({navigation}) => {
   return (
     <Stack.Navigator>
       <Stack.Screen name="RegisterVotePage" component={RegisterVote} options={{ headerShown: false, title: ' ',}}/>
+      <Stack.Screen name="AddVote" component={AddVote} options={{ title: '투표추가',}}/>
 
       <Stack.Screen name="Login" component={Login} options={{ headerShown: false, title: ' ' }} />
       <Stack.Screen name="SignUp" component={SignUp} options={{ title: '회원가입' }} />
