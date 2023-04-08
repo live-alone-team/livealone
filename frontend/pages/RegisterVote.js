@@ -8,15 +8,16 @@ import { SimpleLineIcons, Entypo, FontAwesome5 } from '@expo/vector-icons';
 
 const RegisterVote = () => {
 
-  const [title, setTitle] = useState(''); 
+  const [title, setTitle] = useState('');  
   const [content, setContent] = useState(''); 
   const [inputs, setInputs] = useState([{ key: 1, text: '' }]); // 자식 페이지에서 받아올 값
   const day = ["0","1","2","3","4","5","6","7"]
   const hour = [ "0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"]
   const minute = [ "0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59",]
-  const [selectedDay, setSelectedDay] = useState("0");
+  const [selectedDay, setSelectedDay] = useState("");
   const [selectedHour, setSelectedHour] = useState("0");
   const [selectedMinute, setSelectedMinute] = useState("0");
+  const [reset, setReset] = useState(false);
 
   const navigation = useNavigation();
   const { params } = useRoute();
@@ -78,13 +79,13 @@ const RegisterVote = () => {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": userToken
+          "X-AUTH-TOKEN": userToken 
         },
         body: JSON.stringify({ 
           title : title ,
           description : content,
-          choices : choices,
-          day:selectedDay,
+          choices : choices, 
+          day:selectedDay, 
           hour:selectedHour,
           minute:selectedMinute
         })
@@ -158,7 +159,7 @@ const RegisterVote = () => {
                     <View>
                       <SelectDropdown 
                         rowTextStyle={{fontSize:'17'}}
-                        dropdownStyle={{width:100}}
+                        dropdownStyle={{width:100, borderRadius: 5}}
                         buttonStyle={{width:100, backgroundColor:'white'}}
                         defaultButtonText='0'
                         data={day}
@@ -166,7 +167,7 @@ const RegisterVote = () => {
                           setSelectedDay(selectedItem);
                         }}
                         buttonTextAfterSelection={(selectedItem, index) => {
-                          return selectedItem
+                          return `${selectedDay}`
                         }}
                         rowTextForSelection={(item, index) => {
                           return item
@@ -174,6 +175,12 @@ const RegisterVote = () => {
                         renderDropdownIcon={isOpened => {
                           return <FontAwesome5 name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#444'} size={18} />;
                         }}
+                        reset={reset}
+                        renderCustomizedRowChild={(item, index, isSelected) => (
+                          <View style={{ backgroundColor: isSelected ? '#FF4545' : 'white', width:'100%', height:50, alignItems: 'center', justifyContent: 'center'  }}>
+                            <Text style={{fontSize:18 , color: isSelected ? 'white' : 'black'}}>{item}</Text>
+                          </View>
+                        )}
                       />
                     </View>
                   </View>
@@ -185,7 +192,7 @@ const RegisterVote = () => {
                     <View>
                       <SelectDropdown 
                         rowTextStyle={{fontSize:'17'}}
-                        dropdownStyle={{width:100}}
+                        dropdownStyle={{width:100, borderRadius: 5}}
                         buttonStyle={{width:100, backgroundColor:'white'}}
                         defaultButtonText='0'
                         data={hour}
@@ -193,7 +200,7 @@ const RegisterVote = () => {
                           setSelectedHour(selectedItem);
                         }}
                         buttonTextAfterSelection={(selectedItem, index) => {
-                          return selectedItem
+                          return `${selectedHour}`
                         }}
                         rowTextForSelection={(item, index) => {
                           return item
@@ -201,6 +208,12 @@ const RegisterVote = () => {
                         renderDropdownIcon={isOpened => {
                           return <FontAwesome5 name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#444'} size={18} />;
                         }}
+                        renderCustomizedRowChild={(item, index, isSelected) => (
+                          <View style={{ backgroundColor: isSelected ? '#FF4545' : 'white', width:'100%', height:50, alignItems: 'center', justifyContent: 'center'  }}>
+                            <Text style={{fontSize:18 , color: isSelected ? 'white' : 'black'}}>{item}</Text>
+                          </View>
+                        )}
+                        reset={reset}
                       />
                     </View>
                   </View>
@@ -209,10 +222,10 @@ const RegisterVote = () => {
                     <View style={{alignItems: 'center', marginRight:30}}>
                       <Text>분</Text>
                     </View>
-                    <View>
-                      <SelectDropdown  
+                    <View> 
+                      <SelectDropdown   
                         rowTextStyle={{fontSize:'17'}}
-                        dropdownStyle={{width:100}}
+                        dropdownStyle={{width:100, borderRadius: 5}}
                         buttonStyle={{width:100, backgroundColor:'white'}}
                         defaultButtonText='0'
                         data={minute}
@@ -220,7 +233,7 @@ const RegisterVote = () => {
                           setSelectedMinute(selectedItem);
                         }}
                         buttonTextAfterSelection={(selectedItem, index) => {
-                          return selectedItem
+                          return `${selectedMinute}`
                         }}
                         rowTextForSelection={(item, index) => {
                           return item
@@ -228,6 +241,12 @@ const RegisterVote = () => {
                         renderDropdownIcon={isOpened => {
                           return <FontAwesome5 name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#444'} size={18} />;
                         }}
+                        renderCustomizedRowChild={(item, index, isSelected) => (
+                          <View style={{ backgroundColor: isSelected ? '#FF4545' : 'white', width:'100%', height:50, alignItems: 'center', justifyContent: 'center'  }}>
+                            <Text style={{fontSize:18 , color: isSelected ? 'white' : 'black'}}>{item}</Text>
+                          </View>
+                        )}
+                        reset={reset}
                       />
                     </View>
                   </View>
