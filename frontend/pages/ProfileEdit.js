@@ -1,16 +1,44 @@
-import React, { useState } from 'react';
-import { Button, TextInput, View, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Button, TextInput, View, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, Alert, Image } from 'react-native';
 import { IP } from '@env';
 import { useNavigation } from '@react-navigation/native';
 import { getToken  } from './token';
-
+import RNFS from 'react-native-fs';
+ 
 const ProfileEdit = () => {
 
-  const [password, setPassword] = useState('');
+
+  const [password, setPassword] = useState(''); 
   const [nickname, setNickname] = useState('');
+  const [image, setImage] = useState();
 
   const navigation = useNavigation();
   
+  const isUrl = (str) => {
+    const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
+    return urlRegex.test(str);
+  }
+
+  const getProfile = async () => {
+    const userToken = await getToken();    
+    try {
+      const response = await fetch(`http://${IP}:8080/user/profile`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-TOKEN": userToken
+        },
+      })
+      const data = await response.json(); 
+      setNickname(data.nickname)
+      setImage(data.image)
+      console.log(data.image)
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const updateProfile = async () => {
     const userToken = await getToken();  
     const requestBody = {};
@@ -26,16 +54,22 @@ const ProfileEdit = () => {
         headers: { 
           'Content-Type': 'application/json',
           "X-AUTH-TOKEN": userToken 
-        },
+        }, 
         body: JSON.stringify(requestBody)
       }); 
  
       Alert.alert('수정이 완료되었습니다.','',[
         {text: '확인', onPress: () => navigation.goBack()},
       ]); 
+
       
     } catch (error) { console.error(error); }
   };
+
+  useEffect(() => {
+    getProfile()
+  }, []);
+
 
   return (
     <View style={{flex: 1, backgroundColor: '#FFFFFF'}}>
@@ -43,7 +77,8 @@ const ProfileEdit = () => {
         <StatusBar barStyle="dark-content" />
         {/* 프로필 이미지 수정 */}
         <View style={{width:'100%', height:200, alignItems: 'center', justifyContent: 'center'}}>
-          <View style={{width:'30%',height:'50%', backgroundColor:'black'}}>
+          <View style={{width:'30%',height:'50%', alignItems: 'center'}}>
+            <Image style={{width:'85%',height:'100%'}}  />
           </View>        
         </View>
         <View style={{width:'100%', height:'100%', alignItems: 'center'}}>
@@ -85,8 +120,8 @@ const ProfileEdit = () => {
                       <Text style={{fontSize:20, textAlign: 'center', textAlignVertical: 'center', color:'white'}}>
                         저장하기
                       </Text>
-                    </View>
-                  </TouchableOpacity>
+                    </View>  
+                  </TouchableOpacity> 
               </View>
             </View>
           </View>
