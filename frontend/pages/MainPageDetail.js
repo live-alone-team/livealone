@@ -39,7 +39,7 @@ const MainPageDetail = () => {
             index: 0,
             routes: [{ name: 'Login' }]
           })
-        );
+        ); 
   };
 
   const authErr = () =>
@@ -65,7 +65,7 @@ const MainPageDetail = () => {
         date : "",
         name : "",
       }
-      if(dataKey == 'movies'){
+      if(dataKey == 'movies'){ 
         getItem.title = data.title;
         getItem.image = `https://image.tmdb.org/t/p/w500${data.poster_path}`;
         getItem.overview = data.overview;
@@ -86,7 +86,7 @@ const MainPageDetail = () => {
     } catch (error) {
       console.error(error);
     } 
-  };
+  }; 
 
   const findComment = async (url) => {
     const userToken = await getToken();
@@ -171,8 +171,9 @@ const MainPageDetail = () => {
   };  
 
   const handleTokenAndItem = async () => {
-    await chkToken();
+    await chkToken(); 
     await findItem(`http://${IP}:8080/user/${dataKey}/${id}`);
+
   };
 
   useEffect(() => {
@@ -195,9 +196,9 @@ const MainPageDetail = () => {
 
               {/* 프로필 사진 */}
               <View style={{width: '20%'}}>
-
-              </View> 
-
+                
+              </View>  
+ 
               <View style={{width: '80%'}}>
                 <View style={{width: '100%', height: 40, flexDirection: 'row', alignItems: 'center'}}>
 
@@ -250,7 +251,14 @@ const MainPageDetail = () => {
           setContent(content)
         // 삭제 버튼
         } else if (buttonIndex === 2) {
-          deleteComment(commentId);
+          Alert.alert(
+            '댓글을 삭제 하시겠습니까?','',
+            [
+              {text: '취소', style: 'cancel',},
+              {text: '확인', onPress: () => deleteComment(commentId),},
+            ],
+            { cancelable: false }
+          );
         }
       },
     );  
@@ -310,7 +318,7 @@ const MainPageDetail = () => {
               <SimpleLineIcons name="pencil" size={20} color="#6B7583" style={{ marginLeft: 10 }}/>
             </TouchableOpacity>
           </View>
-        </View>
+        </View> 
 
         <View style={{ marginTop: 20, height: 16, height: 5, backgroundColor:'#EEEEEE' }} />
 

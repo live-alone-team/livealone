@@ -1,37 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import RNPickerSelect from 'react-native-picker-select';
 import { useNavigation } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
-import { IP, TOKEN } from '@env';
+import { getToken  } from './token';
+import { IP } from '@env';
 
-const MainSearchBar = () => {
-  const [search, setSearch] = useState(false);
+const MainSearchBar = () => {  
+  const [search, setSearch] = useState(false); 
   const [selectedValue, setSelectedValue] = useState(null);
   const [searchValue, setSearchValue] = useState(null);
   const [detailPage, setDetailPage] = useState(false);
   const navigation = useNavigation();
-  const { params } = useRoute();
-
+  const { params } = useRoute(); 
   
   const searchResult = async (url) => {
+    const userToken = await getToken();
     try {
       const response = await fetch(url, {
         method: 'GET',
-        headers: {
+        headers: {  
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": TOKEN
+          "X-AUTH-TOKEN": userToken
         },
       })
       const data = await response.json();
       selectedValue == 'youtube' ? searchMove(data.items) : searchMove(data.results)
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  }; 
+  };  
 
-  useEffect(() => {
+  useEffect(() => { 
     if(params != undefined){
       setSearch(params.search)
       setSelectedValue(params.selectedValue)
@@ -39,11 +40,13 @@ const MainSearchBar = () => {
     }
   }, [detailPage]);
   
-  const searchFunc = () => {
+  const searchFunc = () => { 
     if(!selectedValue){
-      console.log(selectedValue + '-1')
+      Alert.alert('검색구분을 선택하여주세요.','',[{text: '확인'},]);
+      return
     }else if(!searchValue){
-      console.log(searchValue + '-2')
+      Alert.alert('검색어를 입력하세요.','',[{text: '확인'},]);
+      return
     }else{
       searchResult(`http://${IP}:8080/user/search/${selectedValue}/${searchValue}`);
     }
@@ -54,7 +57,7 @@ const MainSearchBar = () => {
       params,
       search,
       selectedValue,
-      searchValue
+      searchValue 
     });
     setDetailPage(!detailPage)
   };
@@ -113,13 +116,13 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     height: 40,
     marginBottom: 20
-  },
+  }, 
   searchBox: {
     borderWidth: 0.5,
     borderRadius: 5,
     borderColor: '#D0D5DA',
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center', 
     marginLeft: 20,
   },
   searchBar: {

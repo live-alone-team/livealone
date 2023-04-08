@@ -15,11 +15,11 @@ const Profile = () => {
   const [info, setInfo] = useState([]);
   const [pollList, setPollList] = useState([]);
   const [likeList, setLikeList] = useState([]);
-  
+   
   const chkToken = async () => {
-    const userToken = await getToken();
-    userToken
-      ? setToken(userToken)
+    const userToken = await getToken();  
+    userToken 
+      ? setToken(userToken) 
       : navigation.dispatch(
           CommonActions.reset({
             index: 0,
@@ -48,7 +48,7 @@ const Profile = () => {
 
   const getMyLike = async () => {
     const userToken = await getToken();    
-    try {
+    try { 
       const response = await fetch(`http://${IP}:8080/user/profile/likes`, {
         method: 'GET',
         headers: {
@@ -61,16 +61,16 @@ const Profile = () => {
 
     } catch (error) {
       console.error(error);
-    }
+    } 
   }; 
-
+  
   const getProfile = async () => {
     const userToken = await getToken();    
     try {
       const response = await fetch(`http://${IP}:8080/user/profile`, {
         method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json", 
           "X-AUTH-TOKEN": userToken
         },
       })
@@ -125,7 +125,7 @@ const Profile = () => {
           routes: [
             { name: 'Login' }
           ]
-        })
+        }) 
       );
     } catch (error) {
       console.error(error);
@@ -135,16 +135,16 @@ const Profile = () => {
   const delMessage = () =>
   Alert.alert(
     '회원탈퇴 하시겠습니까?','',
-    [
+    [ 
       {text: '취소', style: 'cancel',},
       {text: '확인', onPress: () => delInfo(),},
     ],
     { cancelable: false }
-  );
+  ); 
 
-  const contents = ({ title, createdDate, index }) => (
-    <View style={{flex:1}}>
-      <View key={index} style={{ width: '100%', height: 70, marginLeft: 20 }}>
+  const contents = ({ title, createdDate, index }) => ( 
+    <View style={{flex:1}} key={index}>
+      <View style={{ width: '100%', height: 70, marginLeft: 20 }}>
         <View style={{width: '100%',height: '55%',flex: 1,justifyContent: 'flex-end',marginBottom: 5,}}>
           <Text style={{ fontSize: 18, fontWeight:'500' }}>{title}</Text>
         </View>
@@ -222,7 +222,7 @@ const Profile = () => {
 
           {/* 투표내역, 좋아요 */}
           <ScrollView style={{height:500}}>
-            {
+            {  
               !chkBtn ? 
               pollList.map((item, index) => (contents({ title: item.title, createdDate: item.createdDate, index: index }))) :
               likeList.map((item, index) => (contents({ title: item.title, createdDate: item.createdDate, index: index })))

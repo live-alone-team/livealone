@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { IP, TOKEN } from '@env';
 import { useNavigation } from '@react-navigation/native';
@@ -7,14 +7,14 @@ import { getToken } from './token';
 
 const VoteSearchBar = () => {
   const [search, setSearch] = useState(false);
-  const [searchValue, setSearchValue] = useState(null);
+  const [searchValue, setSearchValue] = useState(null); 
   const [searchChk, setSearchChk] = useState(false);
   
-  const navigation = useNavigation();
+  const navigation = useNavigation();  
   
-  const searchMove = (params) => {
+  const searchMove = (params) => { 
     navigation.navigate('VoteSearch',{
-      params
+      params 
     });
   };
   
@@ -24,7 +24,7 @@ const VoteSearchBar = () => {
     try {
       const response = await fetch(`${url}?keyword=${searchValue}`, {
         method: 'GET',
-        headers: {
+        headers: { 
           "Content-Type": "application/json",
           "X-AUTH-TOKEN": userToken,
         },
@@ -38,13 +38,14 @@ const VoteSearchBar = () => {
 
   const searchFunc = () => {
     if(!searchValue){
-      console.log(searchValue + '-2')
+      Alert.alert('검색어를 입력하여주세요.','',[{text: '확인'},]);
+      return
     }else{
       searchPollList(`http://${IP}:8080/user/poll/search/${searchValue}`);
       setSearchChk(false);
     }
   }
-
+ 
   useEffect(() => {
     if(searchChk) searchFunc();
   }, [searchChk]);
