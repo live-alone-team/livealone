@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Base64;
 
 @RequiredArgsConstructor
 @RestController
@@ -52,19 +53,21 @@ public class MemberController {
 
     @PostMapping("/profile/image")
     public ResponseEntity<UploadFileResponse> uploadProfile(@RequestPart MultipartFile file,
-                                                @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                @AuthenticationPrincipal UserDetailsImpl userDetails)throws IOException {
         Long memberId = userDetails.getMember().getId();
 
-        String fileDir = "여기에 주소를 '절대경로 + \\'로 넣어주세요";
+        byte[] imageBytes = file.getBytes();
+        String base64Encoded = Base64.getEncoder().encodeToString(imageBytes);
+
+        String fileDir = "/Users/km6293/work/project/livealone/frontend/assets/images/profileImg/";
         String original = file.getOriginalFilename();
         String savedPath = fileDir + original;
-
         try {
             file.transferTo(new File(savedPath));
         } catch (IOException e) {
             throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
         }
-        return ResponseEntity.ok(memberService.uploadProfile(original, memberId));
+        return ResponseEntity.ok(memberService.uploadProfile(base64Encoded, memberId));
     }
 
     @DeleteMapping("/withdrawal")
