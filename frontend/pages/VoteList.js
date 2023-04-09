@@ -24,9 +24,21 @@ const VoteList = ({ vote }) => {
         cancelButtonIndex: 0,
         userInterfaceStyle: 'dark',
       },
-      async buttonIndex => {
-        if (buttonIndex === 1) {
-          await deleteVote(id);
+      buttonIndex => {
+        // 취소 버튼
+        if (buttonIndex === 0) {
+          
+        // 삭제 버튼
+        } else if (buttonIndex === 1) {
+          Alert.alert(
+            '게시물을 삭제 하시겠습니까?','',
+            [
+              {text: '취소', style: 'cancel',},
+              {text: '확인', onPress: () => deleteVote(id),},
+            ],
+            { cancelable: false }
+          );
+          
         }
       },
     );
@@ -34,7 +46,7 @@ const VoteList = ({ vote }) => {
 
   const deleteVote = async (voteId) => {
     const userToken = await getToken();
-    try {
+    try { 
       const response = await fetch(`http://${IP}:8080/user/poll/${voteId}`, {
         method: 'DELETE', 
         headers: {
@@ -60,7 +72,7 @@ const VoteList = ({ vote }) => {
     <View>
       <View style={{ width: '100%', flexDirection: 'row' }}>
         <View style={{ width: '80%', height: '100%', flexDirection: 'row', marginLeft: 25, marginTop: 25, marginBottom: 25 }}>
-
+ 
           {/* 프로필 사진 */}
           <View style={{width: '20%'}}>
  
@@ -84,7 +96,7 @@ const VoteList = ({ vote }) => {
               {/* 제목 */}
               <Text style={{width: '100%', height: 40, fontSize:20, fontWeight:'500'}}>
                 {vote.title}
-              </Text>
+              </Text> 
 
               {/* 내용 */}
               <Text style={{width: '100%', height: 60}}>
