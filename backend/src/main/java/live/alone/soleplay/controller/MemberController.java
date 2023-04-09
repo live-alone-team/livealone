@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Base64;
 
 @RequiredArgsConstructor
 @RestController
@@ -53,13 +52,12 @@ public class MemberController {
 
     @PostMapping("/profile/image")
     public ResponseEntity<UploadFileResponse> uploadProfile(@RequestPart MultipartFile file,
-                                                @AuthenticationPrincipal UserDetailsImpl userDetails)throws IOException {
+                                                @AuthenticationPrincipal UserDetailsImpl userDetails){
         Long memberId = userDetails.getMember().getId();
 
-        byte[] imageBytes = file.getBytes();
-        String base64Encoded = Base64.getEncoder().encodeToString(imageBytes);
 
         String fileDir = "/Users/km6293/work/project/livealone/frontend/assets/images/profileImg/";
+        String fileNmDir = "file:///var/mobile/Containers/Data/Application/17A28928-E735-4D44-BBB3-913DE78863FD/Library/Caches/ExponentExperienceData/%2540km6293%252FAPP_PROJECT/ImagePicker/";
         String original = file.getOriginalFilename();
         String savedPath = fileDir + original;
         try {
@@ -67,7 +65,7 @@ public class MemberController {
         } catch (IOException e) {
             throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
         }
-        return ResponseEntity.ok(memberService.uploadProfile(base64Encoded, memberId));
+        return ResponseEntity.ok(memberService.uploadProfile(fileNmDir+original, memberId));
     }
 
     @DeleteMapping("/withdrawal")
