@@ -25,7 +25,7 @@ const Media = ({title, data, dataKey}) => {
           {[0, 3, 6, 9].map((startIndex, swiperIndex) => (
             <View key={swiperIndex} style={{ flexDirection: "row" }}>
               {[startIndex, startIndex + 1, startIndex + 2].map((index) => (
-                <React.Fragment key={index}>
+                <React.Fragment key={index}> 
                   <View style={styles.slideContainer}>
                     <TouchableOpacity onPress={dataKey != 'youtube' ? () => detailMove(dataKey, data.id[index]) : null}>
                       <Image style={styles.slide} source={{ url: data.image[index] }}/>

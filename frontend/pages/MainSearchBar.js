@@ -33,7 +33,7 @@ const MainSearchBar = () => {
   };  
 
   useEffect(() => { 
-    if(params != undefined){
+    if(params != undefined){ 
       setSearch(params.search)
       setSelectedValue(params.selectedValue)
       setSearchValue(params.searchValue)

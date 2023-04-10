@@ -101,10 +101,11 @@ const VoteDetail = (props) => {
         const data = await response.json();
         if(data.hasOwnProperty('status')){
           Alert.alert(data.detail,'',[{text: '확인'},]);
-          return
         }
-        setVote(true)
+        
+        setDetailData({...detailData, totalVotes: detailData.totalVotes + 1})
         setDetailPreviewData(data)
+        setVote(true)
         
       } catch (error) { console.error(error); }      
     }
@@ -150,12 +151,12 @@ const VoteDetail = (props) => {
         },
       })
     } catch (error) { 
-      console.error(error);
+      console.error(error); 
     }
   };
 
   const btnLike = () => {
-    pushLike();
+    pushLike(); 
     
     var updatedLike = props.route.params.vote.totalLikes
     chkLike ? updatedLike -= 1 : updatedLike += 1
@@ -171,12 +172,13 @@ const VoteDetail = (props) => {
     try {  
       const response = await fetch(url, {
         method: 'GET',
-        headers: {
+        headers: { 
           "Content-Type": "application/json",
           "X-AUTH-TOKEN": userToken
         },
       })
       const data = await response.json();
+            
       if(!data.hasOwnProperty('error')){
         const newData = data.choices.map((item, index) => {
           const val = isNaN(item.voteCount / data.totalVotes) ? 0 : (item.voteCount / data.totalVotes).toFixed(2);
@@ -188,6 +190,7 @@ const VoteDetail = (props) => {
         });
 
         setDetailPreviewData(newData)
+        voteInfoPreview(`http://${IP}:8080/user/poll/${props.route.params.vote.pollId}/result`)
       }
     } catch (error) {
       console.error(error);
@@ -253,6 +256,11 @@ const VoteDetail = (props) => {
 
             {/* 프로필 사진 */}
             <View style={{width: '20%'}}>
+              { 
+                vote.image == null ? 
+                <Image source={require('./../assets/images/profileImg/null.png')} style={{width:50, height:50}} />
+                : <Image source={{ uri: `${vote.image}` }} style={{width:50, height:50}} />
+              }
             </View> 
 
             <View style={{width: '80%'}}>

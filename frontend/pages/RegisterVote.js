@@ -79,7 +79,7 @@ const RegisterVote = () => {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
-          "X-AUTH-TOKEN": userToken 
+          "X-AUTH-TOKEN": userToken  
         },
         body: JSON.stringify({ 
           title : title ,

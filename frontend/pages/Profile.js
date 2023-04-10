@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextInput, View, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { Button, TextInput, View, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
 import {IP} from '@env';
 import { removeToken  } from './token';
 import { getToken  } from './token';
@@ -8,7 +8,7 @@ import { useNavigation , CommonActions, useIsFocused} from '@react-navigation/na
 const Profile = () => {
 
   const navigation = useNavigation();  
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState(''); 
   // false => 투표내역, true => 좋아요
   const [chkBtn, setChkBtn] = useState(false);
   const isFocused = useIsFocused();
@@ -162,14 +162,20 @@ const Profile = () => {
         <View style={{backgroundColor:'#FFFFFF'}}>
 
           {/* 마이페이지 */}
-          <View style={styles.topTitle}>
+          <View style={styles.topTitle}> 
             <Text style={{ fontWeight: 'bold', fontSize: 18 }}>마이페이지</Text>
           </View>
 
           {/* 이미지, 이름, 닉네임 */}
           <View style={{width:'100%', height:105, flexDirection: 'row', alignItems: 'center'}}> 
             {/* 이미지 */}
-            <View style={{width:70, height:70, marginLeft:20,backgroundColor:'black'}}></View>
+            <View style={{width:70, height:70, marginLeft:20}}>
+              {
+                info.image == null ? 
+                <Image source={require('./../assets/images/profileImg/null.png')} style={{width:70, height:70}} />
+                : <Image source={{ uri: `${info.image}` }} style={{width:70, height:70}} />
+              }
+            </View>
             <View style={{marginLeft:25, marginBottom:20}}>
               {/* 이름 */}
               <Text style={{fontSize:18, fontWeight:'700', marginBottom:10}}>{info.name}</Text>

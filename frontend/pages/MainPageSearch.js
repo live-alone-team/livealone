@@ -21,7 +21,7 @@ const MainPageSearch = () => {
       dataKey : dataKey,
       id : id
     }); 
-  };
+  }; 
 
   return (
     <View style={styles.container}>

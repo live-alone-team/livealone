@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ActionSheetIOS, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ActionSheetIOS, Alert, Image } from 'react-native';
 import { Entypo, FontAwesome5, EvilIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getToken  } from './token';
@@ -73,9 +73,13 @@ const VoteList = ({ vote }) => {
       <View style={{ width: '100%', flexDirection: 'row' }}>
         <View style={{ width: '80%', height: '100%', flexDirection: 'row', marginLeft: 25, marginTop: 25, marginBottom: 25 }}>
  
-          {/* 프로필 사진 */}
+          {/* 프로필 사진 */} 
           <View style={{width: '20%'}}>
- 
+            {
+              vote.image == null ? 
+              <Image source={require('./../assets/images/profileImg/null.png')} style={{width:50, height:50}} />
+              : <Image source={{ uri: `${vote.image}` }} style={{width:50, height:50}} />
+            }
           </View> 
 
           <View style={{width: '80%'}}>

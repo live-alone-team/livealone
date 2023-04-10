@@ -81,7 +81,7 @@ const MainPage = () => {
           {/* 타이틀 , 검색 */}
           <MainSearchBar/>
           <ScrollView>
-            {/* 배너 */}
+            {/* 배너 */} 
             <View style={styles.banner}>
               <Swiper
                 showsPagination={false}

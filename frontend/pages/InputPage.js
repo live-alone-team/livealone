@@ -42,7 +42,7 @@ const InputPage = () => {
       <SafeAreaView style={{ flex: 1, backgroundColor:'#FFFFFF', alignItems: 'center' }}>
         <StatusBar barStyle="dark-content" />
         <View style={{width: '90%', height: '100%', alignItems: 'center'}}>
-            <View style={{width:'100%' }}>  
+            <View style={{width:'100%' }}>   
 
               {/* 이메일 */}
               <View style={{marginTop:30,width:'100%', height:'15%'}}>

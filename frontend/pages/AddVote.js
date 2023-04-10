@@ -46,7 +46,7 @@ const AddVote = () => {
       if (input.text === '') {
         Alert.alert('항목을 입력하여주세요.', '', [{text: '확인'},]);
         return;
-      }
+      }  
     }
     const serializedInputs = inputs.map((input) => ({ ...input, text: input.text.trim() }));
     navigation.navigate('RegisterVotePage', {inputs: serializedInputs});

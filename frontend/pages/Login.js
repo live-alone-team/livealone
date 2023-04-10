@@ -28,7 +28,7 @@ const Login = () => {
       if(data.hasOwnProperty('status')){
         setErrCode(data.status)
       } 
-      if(data.hasOwnProperty('jwtToken')){
+      if(data.hasOwnProperty('jwtToken')){ 
         storeToken(data.jwtToken)
           .then(() => {
             navigation.dispatch(
@@ -52,7 +52,9 @@ const Login = () => {
   const SignUp = () => {
     navigation.navigate('SignUp',{}); 
   }
+   
   const GoogleLogin = () => {
+
     navigation.navigate('GoogleLogin',{}); 
   }
   

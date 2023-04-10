@@ -100,6 +100,7 @@ const MainPageDetail = () => {
       })
       const data = await response.json();
       setComments(data)
+      console.log(data)
     } catch (error) {
       console.error(error);
     }
@@ -196,8 +197,12 @@ const MainPageDetail = () => {
 
               {/* 프로필 사진 */}
               <View style={{width: '20%'}}>
-                
-              </View>  
+                {
+                  comments.image == null ? 
+                  <Image source={require('./../assets/images/profileImg/null.png')} style={{width:50, height:50}} />
+                  : <Image source={{ uri: `${comments.image}` }} style={{width:50, height:50}} />
+                }
+              </View>   
  
               <View style={{width: '80%'}}>
                 <View style={{width: '100%', height: 40, flexDirection: 'row', alignItems: 'center'}}>

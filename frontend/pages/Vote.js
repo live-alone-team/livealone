@@ -37,10 +37,10 @@ const Vote = () => {
         headers: {
           "Content-Type": "application/json",
           "X-AUTH-TOKEN": userToken
-        },
+        }, 
       })
       const data = await response.json();
-
+ 
       // 좋아요 체크 추가
       const result = data.map((vote) => {
         const chkLike = likeList.some((like) => like.id === vote.pollId);

@@ -11,7 +11,7 @@ const SignUp = () => {
   const [isAgreeChecked, setIsAgreeChecked] = useState(false);
   const [isInfoChecked, setIsInfoChecked] = useState(false);
   const [isAgeChecked, setIsAgeChecked] = useState(false);
-
+ 
   const navigation = useNavigation();
 
   const inputPage = () => {
